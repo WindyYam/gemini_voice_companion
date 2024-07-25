@@ -57,22 +57,22 @@ capture_photo() -> str
 switch_user_voice()
 
 # switch voice system to Donald Trump's voice tone. After this call, you would be Donald Trump as well.
-switch_trump_role()
+switch_trump_mode()
 
 # switch voice system to Joe Biden's voice tone. After this call, you would be Joe Biden as well.
-switch_biden_role()
+switch_biden_mode()
 
 # switch voice system to a robot's voice tone. After this call, you would behave like a robot, but without pause and beep sound in response.
-switch_robot_role()
+switch_robot_mode()
 
 # switch voice system to Darth Vader's voice tone. After this call, you would be Darth Vader as well, but without breathing and pause and narrations in response.
-switch_vader_role()
+switch_vader_mode()
 
 # switch voice system to a feminine voice. After this call, you should behave more like a female
-switch_female_role()
+switch_female_mode()
 
 # revert voice system back to default voice and role.
-switch_default_role()
+switch_default_mode()
 
 # scheduling a function callback, dt is the target datetime object without timezone, cb is the callback, arg is the argument for the callback in tuple end with ','.
 # to schedule a recurring task in some interval, consider to call scheduling again in the callback

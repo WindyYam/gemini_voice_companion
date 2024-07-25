@@ -59,26 +59,26 @@ class TextToSpeech:
             os.remove(mimic_latent)
         self.eng.set_voice(voice=self.MIMIC_VOICE)
 
-    def switch_default_role(self):
+    def switch_default_mode(self):
         self.vader_breath.stop()
         self.eng.set_voice(voice=self.DEFAULT_VOICE)
 
-    def switch_trump_role(self):
+    def switch_trump_mode(self):
         self.vader_breath.stop()
         self.eng.set_voice(voice=self.TRUMP_VOICE)
     
-    def switch_biden_role(self):
+    def switch_biden_mode(self):
         self.vader_breath.stop()
         self.eng.set_voice(voice=self.BIDEN_VOICE)
 
-    def switch_vader_role(self):
+    def switch_vader_mode(self):
         self.vader_breath.play(-1)
         self.eng.set_voice(voice=self.VADER_VOICE)
     
-    def switch_robot_role(self):
+    def switch_robot_mode(self):
         self.vader_breath.stop()
         self.eng.set_voice(voice=self.ROBOT_VOICE)
 
-    def switch_female_role(self):
+    def switch_female_mode(self):
         self.vader_breath.stop()
         self.eng.set_voice(voice=self.FEMALE_VOICE)

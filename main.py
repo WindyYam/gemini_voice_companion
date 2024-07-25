@@ -190,23 +190,23 @@ if __name__ == "__main__":
     def switch_user_voice():
         text_to_speech.switch_user_voice(voice_recognition.recorder.audio)
 
-    def switch_default_role():
-        text_to_speech.switch_default_role()
+    def switch_default_mode():
+        text_to_speech.switch_default_mode()
 
-    def switch_trump_role():
-        text_to_speech.switch_trump_role()
+    def switch_trump_mode():
+        text_to_speech.switch_trump_mode()
 
-    def switch_biden_role():
-        text_to_speech.switch_biden_role()
+    def switch_biden_mode():
+        text_to_speech.switch_biden_mode()
 
-    def switch_vader_role():
-        text_to_speech.switch_vader_role()
+    def switch_vader_mode():
+        text_to_speech.switch_vader_mode()
 
-    def switch_robot_role():
-        text_to_speech.switch_robot_role()
+    def switch_robot_mode():
+        text_to_speech.switch_robot_mode()
     
-    def switch_female_role():
-        text_to_speech.switch_female_role()
+    def switch_female_mode():
+        text_to_speech.switch_female_mode()
 
     def play_alarm_sound():
         alarm_sound.play(2)
