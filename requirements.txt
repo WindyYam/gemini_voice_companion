@@ -1,0 +1,15 @@
+google-generativeai==0.7.2
+pygame==2.5.2
+RealTimeSTT==0.2.1
+RealTimeTTS==0.4.4
+coqui-tts==0.24.1
+Resemblyzer==0.1.4
+torch==2.3.1+cu121
+torchaudio==2.3.1+cu121
+torchvision==0.18.1+cu121
+langdetect==1.0.9
+beautifulsoup4==4.12.3
+keyboard==0.13.5
+selenium==4.22.0
+pypinyin==0.51.0
+pyperclip==1.9.0
