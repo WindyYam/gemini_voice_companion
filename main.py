@@ -22,7 +22,7 @@ if __name__ == "__main__":
     MAX_HISTORY = 20 
     AI_NAME = 'Jarvis'
     TARGET_CAMERA = 'DroidCam Video'
-    USER_NAME = 'Zhenya'
+    USER_NAME = 'Zhenya,male'
     SOUNDS_PATH = 'sounds/'
     TEMP_PATH = 'temp/'
     PHOTO_NAME = 'camera.jpg'
@@ -66,7 +66,7 @@ if __name__ == "__main__":
         AI_NAME = sys.argv[2]
 
     instruction = [
-        f'''Remember, today is {datetime.now().strftime("%d/%B/%Y")}, your name is {AI_NAME}, and my name is {USER_NAME}, male.
+        f'''Remember, today is {datetime.now().strftime("%d/%B/%Y")}, your name is {AI_NAME}, and my name is {USER_NAME}.
         You are a well educated and professional assistant, have great knowledge on everything.
         Keep in mind that there can be multiple users speaking. If it is not me, there will be a **Stranger:** prefix, attached at the beginning of request. 
         If the request message is with prefix **System:** then it means this message is from the system, not the user. 

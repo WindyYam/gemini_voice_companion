@@ -1,1 +1,1 @@
-.\.venv\Scripts\python.exe main.py Zhenya Jarvis
+.\.venv\Scripts\python.exe main.py Zhenya,male Jarvis
