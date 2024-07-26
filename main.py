@@ -151,8 +151,13 @@ if __name__ == "__main__":
 
     def capture_upload_photo():
         filename = capture_photo()
+        previous = context['upload_file']
         context['upload_file'] = gemini_ai.upload_file(path=filename,
                             display_name="Photo")
+        if previous:
+            # A previously unused photo file
+            gemini_ai.delete_file(previous)
+
 
     def exec_code(code:str):
         try:

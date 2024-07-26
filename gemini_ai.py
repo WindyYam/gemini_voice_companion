@@ -63,3 +63,6 @@ class GeminiAI:
         for item in lists:
             print(item.name)
             genai.delete_file(item)
+
+    def delete_file(self, file : file_types.File):
+        genai.delete_file(file)
