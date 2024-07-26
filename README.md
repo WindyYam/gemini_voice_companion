@@ -27,7 +27,7 @@ Youtube Introduction: https://www.youtube.com/watch?v=HJQ7SzW7oSU&t=444s
 - **House Managing**: Smart house like operation through voice command. It is simulated by pygame as a simple GUI. You can open door, turn on light, etc.
 - **Reminder Schedule**: Schedule a voice reminder or an alarm at specific time.
 - **Information Lookup**: Search for information on the internet.
-- **Navigate Browser**: Use together with information lookup, you can navigate to the search result webpage, e.g. news, youtube page, Wikipeda.
+- **Navigate Browser**: Use together with information lookup, you can navigate to the search result webpage, e.g. news, youtube page, Wikipeda. 
 - **Summarize Webpage**: Use together with information lookup, you can ask the AI to get the content from static webpage and summarize it.
 - **Weather Updates**: Get current weather conditions and forecasts.
 - **News Updates**: Fetch and read out the latest news.
@@ -52,7 +52,7 @@ Then, run the command to install all the other dependencies:
 1. Get the Gemini API key and put it in environment variable as GEMINI_API_KEY (or you can simply replace it in the source code `gemini_ai.py`, not recommended)
 2. Place your voice sample (at least 5 seconds long) as `master.wav` in the sounds directory.
 or, run `./.venv/Scripts/python record_master_wav.py` to record a 30 sec voice sample of yourself.
-3. Run the main script `./.venv/Scripts/python main.py`, or simply double click `run.bat`
+3. Run the main script `./.venv/Scripts/python main.py <USER_NAME> <AI_NAME> <CHROME_USER_DATA_PATH>`, or simply double click `run.bat`(change the arguments in the bat file accordingly)
 
 ### Modes
 

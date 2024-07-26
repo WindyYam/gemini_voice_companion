@@ -121,6 +121,10 @@ def get_webpage_text(url):
     except requests.RequestException as e:
         return f"An error occurred: {e}"
 
+def set_browser_data_path(path):
+    global USER_CHROME_DATA_PATH
+    USER_CHROME_DATA_PATH = path
+
 def check_browser():
     global player
     if not player:
@@ -129,7 +133,7 @@ def check_browser():
         
             # spotify player
             player = Browser(
-                user_data_dir="C:\\Users\\Zhenya\\AppData\\Local\\Google\\Chrome\\User Data",
+                user_data_dir=USER_CHROME_DATA_PATH,
                 profile_directory="Default"
             )
             player.start_driver()

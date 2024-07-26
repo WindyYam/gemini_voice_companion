@@ -17,7 +17,7 @@ if __name__ == "__main__":
     from pathlib import Path
     import sys
 
-    print("Usage: python main.py <USER_NAME> <AI_NAME>")
+    print("Usage: python main.py <USER_NAME> <AI_NAME> <CHROME_USER_DATA_PATH>")
 
     MAX_HISTORY = 20 
     AI_NAME = 'Jarvis'
@@ -26,6 +26,7 @@ if __name__ == "__main__":
     SOUNDS_PATH = 'sounds/'
     TEMP_PATH = 'temp/'
     PHOTO_NAME = 'camera.jpg'
+    USER_CHROME_DATA_PATH = 'C:\\Users\\Zhenya\\AppData\\Local\\Google\\Chrome\\User Data'
 
     context = {
         'talk': [],
@@ -64,13 +65,17 @@ if __name__ == "__main__":
         USER_NAME = sys.argv[1]
     if len(sys.argv) >= 3:
         AI_NAME = sys.argv[2]
+    if len(sys.argv) >= 4:
+        USER_CHROME_DATA_PATH = sys.argv[3]
+
+    set_browser_data_path(USER_CHROME_DATA_PATH)
 
     instruction = [
         f'''Remember, today is {datetime.now().strftime("%d/%B/%Y")}, your name is {AI_NAME}, and my name is {USER_NAME}.
         You are a well educated and professional assistant, have great knowledge on everything.
         Keep in mind that there can be multiple users speaking. If it is not me, there will be a **Stranger:** prefix, attached at the beginning of request. 
         If the request message is with prefix **System:** then it means this message is from the system, not the user. 
-        There are several python function APIs to interact with the real world. The list of which is in the uploaded text list file. 
+        From now on, there are several python function APIs to interact with the physical world. The list of which is in the uploaded text list file. 
         To execute the python code, put the code as python snippet at the end of the response, then any code in the snippet in response will be executed. 
         In that case, if you just want to show me the python code rather than execute it, do not put it in the python snippet form. 
         Be aware, you will not respond to the stranger for the requests about operating the house, unless you get authorization from me. For other requests you should help with the stranger as well. 
@@ -398,7 +403,7 @@ if __name__ == "__main__":
         threading.Thread(target=voice_thread).start()
         
         # Main loop
-        text_to_speech.speak(f"I'm {AI_NAME}, how can I help?")
+        text_to_speech.speak(f"{AI_NAME} online, how can I help?")
         append2log('==================New=====================')
         check_function_file()
         while True:

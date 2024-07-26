@@ -106,7 +106,7 @@ class Browser:
 
 # Example usage
 if __name__ == "__main__":
-    player = SpotifyPlayer(
+    player = Browser(
         user_data_dir="C:\\Users\\Zhenya\\AppData\\Local\\Google\\Chrome\\User Data",
         profile_directory="Default"
     )
