@@ -88,8 +88,10 @@ if __name__ == "__main__":
         try:
             with open('config.json', 'r') as f:
                 config = json.load(f)
+            print('-----')
             for key in default_config.keys():
                 print(key, config[key])
+            print('-----')
 
         except Exception as e:
             print('Load config error! Create new.')
@@ -330,10 +332,9 @@ if __name__ == "__main__":
                 cam.start()
 
         photo_upload_thread = None
+        text_to_speech = TextToSpeech(SOUNDS_PATH, device_name=config['speaker_device'])
         voice_recognition = VoiceRecognition(on_recording_start=on_record_start, device_name=config['recorder_device'])
         main_voice_embed = voice_recognition.generate_embed(Path(main_voice))
-
-        text_to_speech = TextToSpeech(SOUNDS_PATH, device_name=config['speaker_device'])
 
         def trigger_button(e):
             evt_enter.set()
