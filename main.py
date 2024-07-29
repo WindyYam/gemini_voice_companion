@@ -17,16 +17,11 @@ if __name__ == "__main__":
     from pathlib import Path
     import sys
 
-    print("Usage: python main.py <USER_NAME> <AI_NAME> <CHROME_USER_DATA_PATH>")
+    print("Usage: modify the config.json on parameters, and run python main.py")
 
-    MAX_HISTORY = 20 
-    AI_NAME = 'Jarvis'
-    TARGET_CAMERA = 'DroidCam Video'
-    USER_NAME = 'Zhenya,male'
     SOUNDS_PATH = 'sounds/'
     TEMP_PATH = 'temp/'
     PHOTO_NAME = 'camera.jpg'
-    USER_CHROME_DATA_PATH = 'C:\\Users\\Zhenya\\AppData\\Local\\Google\\Chrome\\User Data'
 
     context = {
         'talk': [],
@@ -60,7 +55,8 @@ if __name__ == "__main__":
     # Create the folder if it doesn't exist
     os.makedirs(TEMP_PATH, exist_ok=True)
 
-    # Check if correct number of arguments is provided
+    # Deprecated: Check if correct number of arguments is provided
+    # Replaced by config.json
     if len(sys.argv) >= 2:
         USER_NAME = sys.argv[1]
     if len(sys.argv) >= 3:
@@ -68,10 +64,46 @@ if __name__ == "__main__":
     if len(sys.argv) >= 4:
         USER_CHROME_DATA_PATH = sys.argv[3]
 
-    set_browser_data_path(USER_CHROME_DATA_PATH)
+    def check_config():
+        global config
+
+        # The default values
+        MAX_HISTORY = 20 
+        AI_NAME = 'Jarvis'
+        TARGET_CAMERA = 'DroidCam Video'
+        USER_NAME = 'Zhenya,male'
+        USER_CHROME_DATA_PATH = 'C:\\Users\\Zhenya\\AppData\\Local\\Google\\Chrome\\User Data'
+        RECORDER_DEVICE = None
+        SPEAKER_DEVICE = None
+
+        default_config = {
+            'user_name': USER_NAME,
+            'ai_name': AI_NAME,
+            'user_chrome_data_path': USER_CHROME_DATA_PATH,
+            'max_history' : MAX_HISTORY,
+            'target_camera': TARGET_CAMERA,
+            'recorder_device': RECORDER_DEVICE,
+            'speaker_device': SPEAKER_DEVICE
+        }
+        try:
+            with open('config.json', 'r') as f:
+                config = json.load(f)
+            for key in default_config.keys():
+                print(key, config[key])
+
+        except Exception as e:
+            print('Load config error! Create new.')
+
+            config = default_config
+            print(json.dumps(config, indent = 2))
+            with open('config.json', 'w') as f:
+                json.dump(config, f, indent=2)
+
+    check_config()
+    set_browser_data_path(config['user_chrome_data_path'])
 
     instruction = [
-        f'''Remember, today is {datetime.now().strftime("%d/%B/%Y")}, your name is {AI_NAME}, and my name is {USER_NAME}.
+        f'''Remember, today is {datetime.now().strftime("%d/%B/%Y")}, your name is {config['ai_name']}, and my name is {config['user_name']}.
         You are a well educated and professional assistant, have great knowledge on everything.
         Keep in mind that there can be multiple users speaking. If it is not me, there will be a **Stranger:** prefix, attached at the beginning of request. 
         If the request message is with prefix **System:** then it means this message is from the system, not the user. 
@@ -263,8 +295,8 @@ if __name__ == "__main__":
         img_size = (420, 240)
         cam = None
         if camlist:
-            if TARGET_CAMERA in camlist:
-                cam = pygame.camera.Camera(TARGET_CAMERA, img_size)
+            if config['target_camera'] in camlist:
+                cam = pygame.camera.Camera(config['target_camera'], img_size)
             else:
                 cam = pygame.camera.Camera(camlist[0], img_size)
 
@@ -298,10 +330,10 @@ if __name__ == "__main__":
                 cam.start()
 
         photo_upload_thread = None
-        voice_recognition = VoiceRecognition(on_recording_start=on_record_start)
+        voice_recognition = VoiceRecognition(on_recording_start=on_record_start, device_name=config['recorder_device'])
         main_voice_embed = voice_recognition.generate_embed(Path(main_voice))
 
-        text_to_speech = TextToSpeech(SOUNDS_PATH)
+        text_to_speech = TextToSpeech(SOUNDS_PATH, device_name=config['speaker_device'])
 
         def trigger_button(e):
             evt_enter.set()
@@ -376,7 +408,7 @@ if __name__ == "__main__":
                             if not text_to_speech.stream.is_playing():
                                 temp_text = voice_recognition.transcribe_voice()
                                 print(temp_text)
-                                if AI_NAME in temp_text:
+                                if config['ai_name'] in temp_text:
                                     current_speaker_embed = voice_embed
                                     new_speaker_recorded = True
                                     text = f'**Stranger:**{temp_text}'
@@ -403,7 +435,7 @@ if __name__ == "__main__":
         threading.Thread(target=voice_thread).start()
         
         # Main loop
-        text_to_speech.speak(f"{AI_NAME} online, how can I help?")
+        text_to_speech.speak(f"{config['ai_name']}, online. How can I help you?")
         append2log('==================New=====================')
         check_function_file()
         while True:
@@ -442,8 +474,8 @@ if __name__ == "__main__":
                 # Update context
                 context['talk'].append({'role': 'user', 'parts': parts})
                 context['talk'].append({'role': 'model', 'parts': [response]})
-                if len(context['talk']) > MAX_HISTORY:
-                    context['talk'] = context['talk'][-MAX_HISTORY:]
+                if len(context['talk']) > config['max_history']:
+                    context['talk'] = context['talk'][-config['max_history']:]
                 # Handle any code execution from the response
                 # sometimes the AI generate code with comment only, strip this comment line to avoid trigger code sound effect
                 def remove_comment_lines(s):

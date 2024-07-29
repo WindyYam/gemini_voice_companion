@@ -52,7 +52,8 @@ Then, run the command to install all the other dependencies:
 1. Get the Gemini API key and put it in environment variable as GEMINI_API_KEY (or you can simply replace it in the source code `gemini_ai.py`, not recommended)
 2. Place your voice sample (at least 5 seconds long) as `master.wav` in the sounds directory.
 or, run `./.venv/Scripts/python record_master_wav.py` to record a 30 sec voice sample of yourself.
-3. Run the main script `./.venv/Scripts/python main.py <USER_NAME> <AI_NAME> <CHROME_USER_DATA_PATH>`, or simply double click `run.bat`(change the arguments in the bat file accordingly)
+3. Configure through `config.json` for several parameters. You should modify `user_chrome_data_path` to point to your user profile(Which has Spotify logged in)
+4. Run the main script `./.venv/Scripts/python main.py`, or simply double click `run.bat`
 
 ### Modes
 
@@ -75,7 +76,7 @@ or, run `./.venv/Scripts/python record_master_wav.py` to record a 30 sec voice s
 
 ## Tip
 
-- The Free talk mode does continuous voice sample analysis thus is energy hunger if you are taking your laptop with only battery. The trigger mode works better in this scenario.
+- The Free talk mode does continuous voice sample analysis thus is (slightly more) energy hunger if you are taking your laptop with only battery and in noisy environment. The trigger mode works better in this scenario.
 - Sometimes Gemini can be carried away by the context thus forgot to call function for a specific task, you should remind it about the function access like "Have you forgot you had function API access?". I have no good solution to this yet.
 
 ## Contributing

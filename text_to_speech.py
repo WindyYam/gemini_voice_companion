@@ -4,8 +4,9 @@ import wave
 import pygame
 import langdetect
 import numpy as np
+import pyaudio
 class TextToSpeech:
-    def __init__(self, voice_path):
+    def __init__(self, voice_path, device_name = None):
         self.DEFAULT_VOICE = 'default'
         self.MIMIC_VOICE = 'mimic'
         self.TRUMP_VOICE = 'trump3'
@@ -25,7 +26,22 @@ class TextToSpeech:
             default_silence_duration=0.2,
             voices_path=voice_path,
             language='en')
-        self.stream = RealtimeTTS.TextToAudioStream(self.eng)
+        
+        audio = pyaudio.PyAudio()
+        info = audio.get_default_host_api_info()
+        numdevices = info.get('deviceCount')
+        device_index = None
+
+        if device_name:
+            for i in range(0, numdevices):
+                if audio.get_device_info_by_host_api_device_index(0, i).get('maxOutputChannels') > 0:
+                    if device_name in audio.get_device_info_by_host_api_device_index(0, i).get('name'):
+                        device_index = i
+        if device_index:
+            print('Setting Speaker: ', audio.get_device_info_by_host_api_device_index(0, device_index).get('name'))
+        else:
+            print('Setting Speaker: ', audio.get_default_output_device_info().get('name'))
+        self.stream = RealtimeTTS.TextToAudioStream(self.eng, output_device_index=None)
         
         self.vader_breath = pygame.mixer.Sound(f"{voice_path}breathing.mp3")
         self.vader_breath.set_volume(0.1)

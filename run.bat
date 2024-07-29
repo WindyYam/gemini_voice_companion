@@ -1,1 +1,1 @@
-.\.venv\Scripts\python.exe main.py Zhenya,male Jarvis "C:\\Users\\Zhenya\\AppData\\Local\\Google\\Chrome\\User Data"
+.\.venv\Scripts\python.exe main.py
