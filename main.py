@@ -17,11 +17,13 @@ if __name__ == "__main__":
     from pathlib import Path
     import sys
 
-    print("Usage: modify the config.json on parameters, and run python main.py")
+    print("Usage: Modify the config.json on parameters, and run: python main.py")
+    print("Usage: To use a different config.json, run: python main.py your_config.json")
 
     SOUNDS_PATH = 'sounds/'
     TEMP_PATH = 'temp/'
     PHOTO_NAME = 'camera.jpg'
+    CONFIG_FILE = 'config.json'
 
     context = {
         'talk': [],
@@ -55,14 +57,8 @@ if __name__ == "__main__":
     # Create the folder if it doesn't exist
     os.makedirs(TEMP_PATH, exist_ok=True)
 
-    # Deprecated: Check if correct number of arguments is provided
-    # Replaced by config.json
     if len(sys.argv) >= 2:
-        USER_NAME = sys.argv[1]
-    if len(sys.argv) >= 3:
-        AI_NAME = sys.argv[2]
-    if len(sys.argv) >= 4:
-        USER_CHROME_DATA_PATH = sys.argv[3]
+        CONFIG_FILE = sys.argv[1]
 
     def check_config():
         global config
@@ -86,7 +82,7 @@ if __name__ == "__main__":
             'speaker_device': SPEAKER_DEVICE
         }
         try:
-            with open('config.json', 'r') as f:
+            with open(CONFIG_FILE, 'r') as f:
                 config = json.load(f)
             print('-----')
             for key in default_config.keys():
@@ -98,7 +94,7 @@ if __name__ == "__main__":
 
             config = default_config
             print(json.dumps(config, indent = 2))
-            with open('config.json', 'w') as f:
+            with open(CONFIG_FILE, 'w') as f:
                 json.dump(config, f, indent=2)
 
     check_config()
