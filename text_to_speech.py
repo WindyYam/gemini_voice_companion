@@ -41,7 +41,7 @@ class TextToSpeech:
             print('Setting Speaker: ', audio.get_device_info_by_host_api_device_index(0, device_index).get('name'))
         else:
             print('Setting Speaker: ', audio.get_default_output_device_info().get('name'))
-        self.stream = RealtimeTTS.TextToAudioStream(self.eng, output_device_index=None)
+        self.stream = RealtimeTTS.TextToAudioStream(self.eng, output_device_index=device_index)
         
         self.vader_breath = pygame.mixer.Sound(f"{voice_path}breathing.mp3")
         self.vader_breath.set_volume(0.1)
