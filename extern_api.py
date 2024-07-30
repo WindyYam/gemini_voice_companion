@@ -59,7 +59,7 @@ def bingSearch(query:str)->str:
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
     }
-    url = f'https://bing.com/search?q={query.replace(" ","+")}&count=10'
+    url = f'https://bing.com/search?q={query.replace(" ","+")}'
 
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -189,3 +189,7 @@ def get_clipboard_text() -> str:
     import pyperclip
     s = pyperclip.paste()
     return s
+
+if __name__ == "__main__":
+    ret = bingSearch('News update')
+    print(ret)
