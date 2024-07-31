@@ -256,14 +256,15 @@ if __name__ == "__main__":
 
     def freetalk_mode(on:bool):
         previous = context['freetalk']
-        context['freetalk'] = on
         if previous == False and on == True:
+            context['freetalk'] = on
             # The voice recognition thread might stuck on the event waiting for key input, we cancel that first
             evt_enter.set()
         elif previous == True and on == False:
             # hack to bypass the wait for audio in voice recorder
             voice_recognition.recorder.start()
             voice_recognition.recorder.stop()
+            context['freetalk'] = on
 
     def get_today_conversation() -> str:
         fname = TEMP_PATH + 'chatlog-' + today + '.txt'
@@ -460,6 +461,7 @@ if __name__ == "__main__":
                 try:
                     response = gemini_ai.generate_response(temp)
                 except Exception as e:
+                    print(e)
                     text_to_speech.speak("Well, looks like I can't get a response from the server.")
                     continue
                 print(f"AI: {response}")
