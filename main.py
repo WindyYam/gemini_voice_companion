@@ -331,7 +331,6 @@ if __name__ == "__main__":
         photo_upload_thread = None
         text_to_speech = TextToSpeech(SOUNDS_PATH, device_name=config['speaker_device'])
         voice_recognition = VoiceRecognition(on_recording_start=on_record_start, device_name=config['recorder_device'])
-        main_voice_embed = voice_recognition.generate_embed(Path(main_voice))
 
         def trigger_button(e):
             evt_enter.set()
@@ -348,9 +347,11 @@ if __name__ == "__main__":
         def voice_thread():
             new_speaker_recorded = False
             verify_threshold = 0.70
+            main_voice_embed = voice_recognition.generate_embed(Path(main_voice))
             while True:
                 try:
                     text = None
+                    temp_text = None
                     if not context['freetalk']:
                         # -179 is the play/pause media key
                         keyboard.on_press_key(-179, trigger_button, suppress=True)
@@ -402,21 +403,28 @@ if __name__ == "__main__":
                             text = temp_text
                             voice_off_sound.play()
                         else:
+
                             # do the AI_NAME match only when it is not talking, as this consumes GPU resource
                             if not text_to_speech.stream.is_playing():
                                 temp_text = voice_recognition.transcribe_voice()
                                 print(temp_text)
                                 if config['ai_name'] in temp_text:
-                                    current_speaker_embed = voice_embed
-                                    new_speaker_recorded = True
-                                    text = f'**Stranger:**{temp_text}'
+                                    if 'master' in temp_text:
+                                        # A phrase like "Jarvis, I'm your master ..." will update master voice embed, this is a backdoor for now
+                                        main_voice_embed = voice_embed
+                                        text = temp_text
+                                    else:
+                                        current_stranger_embed = voice_embed
+                                        new_speaker_recorded = True
+                                        text = f'**Stranger:**{temp_text}'
                                     voice_off_sound.play()
 
-                            if text == None and new_speaker_recorded:
-                                current_speaker_similarity = voice_recognition.verify_speaker(current_speaker_embed, voice_embed)
+                            if not text and new_speaker_recorded:
+                                current_speaker_similarity = voice_recognition.verify_speaker(current_stranger_embed, voice_embed)
                                 print('speaker similarity:', current_speaker_similarity)
                                 if current_speaker_similarity > verify_threshold:
-                                    temp_text = voice_recognition.transcribe_voice()
+                                    if not temp_text:
+                                        temp_text = voice_recognition.transcribe_voice()
                                     text = f'**Stranger:**{temp_text}'
                                     voice_off_sound.play()
 

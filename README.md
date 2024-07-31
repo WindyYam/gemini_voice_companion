@@ -66,10 +66,12 @@ or, run `./.venv/Scripts/python record_master_wav.py` to record a 30 sec voice s
 
 ### Activating your voice
 
-- For the master user, the voice is already recognized by the voice sample.
+- For the master user, the voice is already recognized by the `master.wav` voice sample.
 - For others, the default keyword is "Jarvis"(Or AI_NAME if you modified it). Use it in a phrase long enough to generate a voice embedding, so the AI can recognize the voice subsequentially without the keyword.
 - Once activated, the companion will recognize the current user until another user activates it.
 - All other users other than master will be considered as stranger, Gemini will not react to the house commands from them. But will still help with other commands.
+- Keep in mind, if you change the recorder device (like from a microphone to a VoIP output), the system might have problem recognize your voice, so you might need to record the `master.wav` again with new recorder device.
+- Or, a backdoor to temporarily override master user embed is to say: "Jarvis(Or AI_NAME if you modified it), I'm your master now ...", then, the speaker will be the master. 
 
 ## Customization
 
