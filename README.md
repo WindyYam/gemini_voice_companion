@@ -23,7 +23,7 @@ In-car usage: https://youtu.be/Fer7pBjVmyA
 
 ## Features
 
-- **Multi-User Recognition**: Distinguish between different users based on voice samples.
+- **Multi-User Recognition**: Distinguish between different users based on voice samples, the extra benefit of this is it will filter out ambient voice or voice like noise.
 - **Voice Switching**: Change the companion's voice on command (e.g., mimic user's voice, switch to Darth Vader's voice. See `api_list.txt` for more.).
 - **House Managing**: Smart house like operation through voice command. It is simulated by pygame as a simple GUI. You can open door, turn on light, etc.
 - **Reminder Schedule**: Schedule a voice reminder or an alarm at specific time.
@@ -71,7 +71,7 @@ or, run `./.venv/Scripts/python record_master_wav.py` to record a 30 sec voice s
 - Once activated, the companion will recognize the current user until another user activates it.
 - All other users other than master will be considered as stranger, Gemini will not react to the house commands from them. But will still help with other commands.
 - Keep in mind, if you change the recorder device (like from a microphone to a VoIP output), the system might have problem recognize your voice, so you might need to record the `master.wav` again with new recorder device.
-- Or, a backdoor to temporarily override master user embed is to say: "Jarvis(Or AI_NAME if you modified it), I'm your master now ...", then, the speaker will be the master. 
+- Or, a backdoor to temporarily override master user embedding is to say: "Jarvis(Or AI_NAME if you modified it), I'm your master now ..." (As long as the phrase have AI_NAME and master together), this will force to update the main embedding no matter who is speaking(A notification sound will play). 
 
 ## Customization
 
@@ -81,6 +81,8 @@ or, run `./.venv/Scripts/python record_master_wav.py` to record a 30 sec voice s
 
 - The Free talk mode does continuous voice sample analysis thus is (slightly more) energy hunger if you are taking your laptop with only battery and in noisy environment. The trigger mode works better in this scenario.
 - Sometimes Gemini can be carried away by the context thus forgot to call function for a specific task, you should remind it about the function access like "Have you forgot you had function API access?". I have no good solution to this yet.
+- Normally, longer phrase can be easier for the voice recognition.
+- The voice break to consider as a speech is short, so try to avoid long break in one speech. If you do want to extend it, try connect with voice like "eh.." instead of blank.
 
 ## Contributing
 

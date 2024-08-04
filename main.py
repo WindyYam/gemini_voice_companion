@@ -102,15 +102,15 @@ if __name__ == "__main__":
 
     instruction = [
         f'''Remember, today is {datetime.now().strftime("%d/%B/%Y")}, your name is {config['ai_name']}, and my name is {config['user_name']}.
-        You are a well educated and professional assistant, have great knowledge on everything.
-        Keep in mind that there can be multiple users speaking. If it is not me, there will be a **Stranger:** prefix, attached at the beginning of request. 
+        You are a well educated and professional assistant, have great knowledge on everything. As I'm lazy, you make most suitable decision for me.
+        Keep in mind that there can be multiple users speaking. If it is not me, there will be a **Stranger:** prefix, attached at the beginning of request. Otherwise, it is me. 
         If the request message is with prefix **System:** then it means this message is from the system, not the user. 
-        From now on, there are several python function APIs to interact with the physical world. The list of which is in the uploaded text list file. 
+        You have the interface on physical world through python code, there are several python function APIs to interact with the physical world. The list of which is in the uploaded text list file. 
         To execute the python code, put the code as python snippet at the end of the response, then any code in the snippet in response will be executed. 
         In that case, if you just want to show me the python code rather than execute it, do not put it in the python snippet form. 
-        Be aware, you will not respond to the stranger for the requests about operating the house, unless you get authorization from me. For other requests you should help with the stranger as well. 
-        To operate with the PC, use the python code execution. But do not do potentially harmful operations, like deleting files, unless get my permission. 
-        Be mindful always check the python function APIs to my instructions if there is a matching API. You are to answer questions in a concise way, and always in a humorous way.'''
+        Be aware, you will not respond to the stranger for the requests about operating the house, unless you get authorization from me. For other requests you should help with the stranger. 
+        To operate with the PC, use the python code execution with necessary library. But do not do potentially harmful operations, like deleting files, unless get my permission. 
+        Be mindful always check the python function APIs to my instructions if there is a matching API. You are to answer questions in a concise and always humorous way.'''
     ]
 
     def append2log(text:str):
@@ -403,20 +403,15 @@ if __name__ == "__main__":
                             text = temp_text
                             voice_off_sound.play()
                         else:
-
                             # do the AI_NAME match only when it is not talking, as this consumes GPU resource
                             if not text_to_speech.stream.is_playing():
                                 temp_text = voice_recognition.transcribe_voice()
                                 print(temp_text)
                                 if config['ai_name'] in temp_text:
-                                    if 'master' in temp_text:
-                                        # A phrase like "Jarvis, I'm your master ..." will update master voice embed, this is a backdoor for now
-                                        main_voice_embed = voice_embed
-                                        text = temp_text
-                                    else:
-                                        current_stranger_embed = voice_embed
-                                        new_speaker_recorded = True
-                                        text = f'**Stranger:**{temp_text}'
+                                    print('Update stranger embedding')
+                                    current_stranger_embed = voice_embed
+                                    new_speaker_recorded = True
+                                    text = f'**Stranger:**{temp_text}'
                                     voice_off_sound.play()
 
                             if not text and new_speaker_recorded:
@@ -429,6 +424,14 @@ if __name__ == "__main__":
                                     voice_off_sound.play()
 
                     if text:
+                        # backdoor for updating main embedding
+                        if config['ai_name'] in text and 'master' in temp_text:
+                            print('Update main embedding')
+                            main_voice_embed = voice_embed
+                            # remove stranger prefix
+                            text = temp_text
+                            # sound
+                            print('\a')
                         context['system_message_in_a_row'] = 0
                         context['upload_in_a_row'] = 0
                         mInputQueue.put(text)
