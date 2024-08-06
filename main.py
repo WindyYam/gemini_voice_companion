@@ -407,7 +407,7 @@ if __name__ == "__main__":
                             if not text_to_speech.stream.is_playing():
                                 temp_text = voice_recognition.transcribe_voice()
                                 print(temp_text)
-                                if config['ai_name'] in temp_text:
+                                if (config['ai_name'] in temp_text) or ('to meet you' in temp_text):
                                     print('Update stranger embedding')
                                     current_stranger_embed = voice_embed
                                     new_speaker_recorded = True
