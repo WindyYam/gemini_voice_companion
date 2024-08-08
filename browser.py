@@ -59,10 +59,10 @@ class Browser:
             actions.move_to_element(first_result).perform()
             
             button = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, "[data-testid='play-button']"))
+                EC.visibility_of_any_elements_located((By.CSS_SELECTOR, "[data-testid='play-button']"))
             )
             
-            button.click()
+            button[0].click()
             
             print(f"Now playing: {song_name}")
             return True
