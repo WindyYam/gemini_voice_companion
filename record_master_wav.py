@@ -9,7 +9,7 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 RECORD_SECONDS = 30
-WAVE_OUTPUT_FILENAME = "sounds/master.wav"
+WAVE_OUTPUT_PATH = "sounds/users/"
 
 # Initialize PyAudio
 p = pyaudio.PyAudio()
@@ -21,7 +21,8 @@ stream = p.open(format=FORMAT,
                 input=True,
                 frames_per_buffer=CHUNK)
 
-print("We are going to record 30 seconds voice.")
+username = input("Please enter the user name:")
+print(f"We are going to record 30 seconds voice for {username}.")
 for i in [3, 2, 1]:
     print(f"* Recording will start in {i} seconds...")
     time.sleep(1)
@@ -41,12 +42,16 @@ stream.stop_stream()
 stream.close()
 p.terminate()
 
+from pathlib import Path
+Path(WAVE_OUTPUT_PATH).mkdir(parents=True, exist_ok=True)
+filename = WAVE_OUTPUT_PATH + username + '.wav'
+
 # Save the recorded data as a WAV file
-wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
+wf = wave.open(filename, 'wb')
 wf.setnchannels(CHANNELS)
 wf.setsampwidth(p.get_sample_size(FORMAT))
 wf.setframerate(RATE)
 wf.writeframes(b''.join(frames))
 wf.close()
 
-print(f"* Audio saved as {WAVE_OUTPUT_FILENAME}")
+print(f"* Audio saved as {filename}")

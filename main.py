@@ -21,6 +21,7 @@ if __name__ == "__main__":
     print("Usage: To use a different config.json, run: python main.py your_config.json")
 
     SOUNDS_PATH = 'sounds/'
+    USER_VOICE_PATH = 'sounds/users'
     TEMP_PATH = 'temp/'
     PHOTO_NAME = 'camera.jpg'
     CONFIG_FILE = 'config.json'
@@ -52,8 +53,6 @@ if __name__ == "__main__":
     today = str(date.today())
     evt_enter = threading.Event()
 
-    main_voice = f"{SOUNDS_PATH}master.wav"
-
     # Create the folder if it doesn't exist
     os.makedirs(TEMP_PATH, exist_ok=True)
 
@@ -67,13 +66,11 @@ if __name__ == "__main__":
         MAX_HISTORY = 20 
         AI_NAME = 'Jarvis'
         TARGET_CAMERA = 'DroidCam Video'
-        USER_NAME = 'Zhenya,male'
         USER_CHROME_DATA_PATH = 'C:\\Users\\Zhenya\\AppData\\Local\\Google\\Chrome\\User Data'
         RECORDER_DEVICE = None
         SPEAKER_DEVICE = None
 
         default_config = {
-            'user_name': USER_NAME,
             'ai_name': AI_NAME,
             'user_chrome_data_path': USER_CHROME_DATA_PATH,
             'max_history' : MAX_HISTORY,
@@ -101,14 +98,14 @@ if __name__ == "__main__":
     set_browser_data_path(config['user_chrome_data_path'])
 
     instruction = [
-        f'''Remember, today is {datetime.now().strftime("%d/%B/%Y")}, your name is {config['ai_name']}, and my name is {config['user_name']}.
+        f'''Remember, today is {datetime.now().strftime("%d/%B/%Y")}, your name is {config['ai_name']}.
         You are a well educated and professional assistant, have great knowledge on everything. As I'm lazy, you make most suitable decision for me.
-        Keep in mind that there can be multiple users speaking. If it is not me, there will be a **Stranger:** prefix, attached at the beginning of request. Otherwise, it is me. 
+        Keep in mind that there can be multiple users speaking. If it is a main master user, his/her name will be as prefix. If it is a stranger, there will be a **Stranger:** prefix, attached at the beginning of request. 
         If the request message is with prefix **System:** then it means this message is from the system, not the user. 
         You have the interface on physical world through python code, there are several python function APIs to interact with the physical world. The list of which is in the uploaded text list file. 
         To execute the python code, put the code as python snippet at the end of the response, then any code in the snippet in response will be executed. 
         In that case, if you just want to show me the python code rather than execute it, do not put it in the python snippet form. 
-        Be aware, you will not respond to the stranger for the requests about operating the house, unless you get authorization from me. For other requests you should help with the stranger. 
+        Be aware, you will not respond to the stranger for the requests about operating the house, unless you get authorization from the master users that are not stranger. For other kinds of requests, you should help with the stranger. 
         To operate with the PC, use the python code execution with necessary library. But do not do potentially harmful operations, like deleting files, unless get my permission. 
         Be mindful always check the python function APIs to my instructions if there is a matching API. You are to answer questions in a concise and always humorous way.'''
     ]
@@ -338,6 +335,7 @@ if __name__ == "__main__":
         def input_thread():
             while True:
                 text = input()
+                text = f'**Master:**{text}'
                 context['system_message_in_a_row'] = 0
                 context['upload_in_a_row'] = 0
                 if context['continuous_photo_mode']:
@@ -347,7 +345,22 @@ if __name__ == "__main__":
         def voice_thread():
             new_speaker_recorded = False
             verify_threshold = 0.70
-            main_voice_embed = voice_recognition.generate_embed(Path(main_voice))
+            
+            user_lists = []
+            for root, _, files in os.walk(USER_VOICE_PATH):
+                for file in files:
+                    if file.endswith('.wav'):
+                        file_path = os.path.join(root, file)
+                        user = os.path.splitext(file)[0]
+                        
+                        # Generate embedding
+                        embedding = voice_recognition.generate_embed(Path(file_path))
+                        
+                        user_lists.append({
+                            "user": user,
+                            "embedding": embedding
+                        })
+
             while True:
                 try:
                     text = None
@@ -377,10 +390,17 @@ if __name__ == "__main__":
                             temp_text = voice_recognition.transcribe_voice()
                             
                             voice_embed = voice_recognition.generate_embed(voice_recognition.recorder.audio)
-                            main_similarity = voice_recognition.verify_speaker(main_voice_embed, voice_embed)
-                            print('main similarity:', main_similarity)
-                            if main_similarity > verify_threshold:
-                                text = temp_text
+                            closest_similirity = 0
+                            closest_user = None
+                            for item in user_lists:
+                                user_similarity = voice_recognition.verify_speaker(item['embedding'], voice_embed)
+                                print(f"{item['user']} similarity:", user_similarity)
+                                if user_similarity > closest_similirity:
+                                    closest_similirity = user_similarity
+                                    closest_user = item['user']
+
+                            if closest_similirity > verify_threshold:
+                                text = f'**{closest_user}:**{temp_text}'
                             else:
                                 text = f'**Stranger:**{temp_text}'
 
@@ -396,11 +416,18 @@ if __name__ == "__main__":
                         # in free talk mode, we verify the speaker
                         voice_embed = voice_recognition.generate_embed(voice_recognition.recorder.audio)
 
-                        main_similarity = voice_recognition.verify_speaker(main_voice_embed, voice_embed)
-                        print('main similarity:', main_similarity)
-                        if main_similarity > verify_threshold:
+                        closest_similirity = 0
+                        closest_user = None
+                        for item in user_lists:
+                            user_similarity = voice_recognition.verify_speaker(item['embedding'], voice_embed)
+                            print(f"{item['user']} similarity:", user_similarity)
+                            if user_similarity > closest_similirity:
+                                closest_similirity = user_similarity
+                                closest_user = item['user']
+
+                        if closest_similirity > verify_threshold:
                             temp_text = voice_recognition.transcribe_voice()
-                            text = temp_text
+                            text = f'**{closest_user}:**{temp_text}'
                             voice_off_sound.play()
                         else:
                             # do the AI_NAME match only when it is not talking, as this consumes GPU resource
@@ -426,10 +453,23 @@ if __name__ == "__main__":
                     if text:
                         # backdoor for updating main embedding
                         if config['ai_name'] in text and 'master' in temp_text:
-                            print('Update main embedding')
-                            main_voice_embed = voice_embed
-                            # remove stranger prefix
-                            text = temp_text
+                            print('Update master embedding')
+                            item = {
+                                "user": 'Master',
+                                "embedding": voice_embed
+                            }
+
+                            text = f'**{item['user']}:**{temp_text}'
+                            
+                            master_exists = False
+                            for item in user_lists:
+                                if item['user'] == 'Master':
+                                    item['embedding'] = voice_embed
+                                    master_exists = True
+                                    break
+                            
+                            if not master_exists:
+                                user_lists.append({'user': 'Master', 'embedding': voice_embed})
                             # sound
                             print('\a')
                         context['system_message_in_a_row'] = 0

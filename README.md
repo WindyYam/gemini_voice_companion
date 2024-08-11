@@ -51,8 +51,7 @@ Then, run the command to install all the other dependencies:
 ## Usage
 
 1. Get the Gemini API key and put it in environment variable as GEMINI_API_KEY (or you can simply replace it in the source code `gemini_ai.py`, not recommended)
-2. Place your voice sample (at least 5 seconds long) as `master.wav` in the sounds directory.
-or, run `./.venv/Scripts/python record_master_wav.py` to record a 30 sec voice sample of yourself.
+2. Run `./.venv/Scripts/python record_master_wav.py` to record a 30 sec voice sample of a user. You can add multiple users.
 3. Configure through `config.json` for several parameters. You should modify `user_chrome_data_path` to point to your user profile(Which has Spotify logged in)
 4. Run the main script `./.venv/Scripts/python main.py`, or simply double click `run.bat`
 
@@ -66,12 +65,12 @@ or, run `./.venv/Scripts/python record_master_wav.py` to record a 30 sec voice s
 
 ### Activating your voice
 
-- For the master user, the voice is already recognized by the `master.wav` voice sample.
-- For others, the default keyword is "Jarvis"(Or AI_NAME if you modified it), or "Nice/Pleased/Good/Ok/xxx to meet you". Use it in a phrase long enough to generate a voice embedding, so the AI can recognize the voice subsequentially without the keyword.
-- For others, once activated, the companion will recognize the current user until another user replace it.
-- All other users other than master will be considered as stranger, Gemini will not react to the house commands from them. But will still help with other commands.
-- Keep in mind, if you change the recorder device (like from a microphone to a VoIP output), the system might have problem recognize your voice, so you might need to record the `master.wav` again with new recorder device.
-- Or, a backdoor to temporarily override master user embedding is to say: "Jarvis(Or AI_NAME if you modified it), ... I'm your master ..." (As long as the phrase have AI_NAME and master together), this will force to update the main embedding no matter who is speaking(A notification sound will play). 
+- For the main users, the voice is already recognized by the setup voice samples in ## Usage 2.
+- For a stranger that is not in the list, the default keyword is "Jarvis"(Or AI_NAME if you modified it), or "Nice/Pleased/Good/Ok/xxx to meet you". Use it in a phrase long enough to generate a voice embedding, so the AI can recognize the voice subsequentially without the keyword.
+- For stranger, once activated, the companion will recognize the current user until another stranger replace it.
+- All strangers other than main users will be considered as stranger using prefix, Gemini will not react to the house commands from them. But will still help with other commands.
+- Keep in mind, if you change the recorder device (like from a microphone to a VoIP output), the system might have problem recognize your voice, so you might need to record in ## Usage 2 again with new recorder device(as a new user with different voice sample).
+- Or, a backdoor to temporarily setup a master user embedding is to say: "Jarvis(Or AI_NAME if you modified it), ... I'm your master ..." (As long as the phrase have AI_NAME and master together), this will force to update the main embedding no matter who is speaking(A notification sound will play). 
 
 ## Customization
 
