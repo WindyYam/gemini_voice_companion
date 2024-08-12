@@ -8,7 +8,7 @@ CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
-RECORD_SECONDS = 30
+RECORD_SECONDS = 15
 WAVE_OUTPUT_PATH = "sounds/users/"
 
 # Initialize PyAudio
@@ -22,7 +22,7 @@ stream = p.open(format=FORMAT,
                 frames_per_buffer=CHUNK)
 
 username = input("Please enter the user name:")
-print(f"We are going to record 30 seconds voice for {username}.")
+print(f"We are going to record {RECORD_SECONDS} seconds voice for {username}.")
 for i in [3, 2, 1]:
     print(f"* Recording will start in {i} seconds...")
     time.sleep(1)

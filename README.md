@@ -10,6 +10,7 @@ My Laptop is nVidia RTX A500 with 4GB VRAM. So in `voice_recognition.py` I am us
 
 Introduction: https://youtu.be/6NTnIVsfiNM
 In-car usage: https://youtu.be/Fer7pBjVmyA
+Answer phone call(remote usage): https://youtu.be/kon9clc4MDQ
 
 ## Core dependencies
 
@@ -51,7 +52,7 @@ Then, run the command to install all the other dependencies:
 ## Usage
 
 1. Get the Gemini API key and put it in environment variable as GEMINI_API_KEY (or you can simply replace it in the source code `gemini_ai.py`, not recommended)
-2. Run `./.venv/Scripts/python record_master_wav.py` to record a 30 sec voice sample of a user. You can add multiple users.
+2. Run `./.venv/Scripts/python record_master_wav.py` to record a 15 sec voice sample of a user. You can add multiple users.
 3. Configure through `config.json` for several parameters. You should modify `user_chrome_data_path` to point to your user profile(Which has Spotify logged in)
 4. Run the main script `./.venv/Scripts/python main.py`, or simply double click `run.bat`
 
