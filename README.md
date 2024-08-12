@@ -83,6 +83,8 @@ Then, run the command to install all the other dependencies:
 - Sometimes Gemini can be carried away by the context thus forgot to call function for a specific task, you should remind it about the function access like "Have you forgot you had function API access?". I have no good solution to this yet.
 - Normally, longer phrase can be easier for the voice recognition.
 - The voice break to consider as a speech is short, so try to avoid long break in one speech. If you do want to extend it, try connect with voice like "eh.." instead of blank.
+- If you find the voice recognition fails too many times, consider re-record your voice sample or lower the 'voice_similarity_threshold' field in `config.json`
+- To remove a user voice sample, simply delete file in sounds/users
 
 ## Contributing
 

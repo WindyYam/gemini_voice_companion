@@ -76,7 +76,8 @@ if __name__ == "__main__":
             'max_history' : MAX_HISTORY,
             'target_camera': TARGET_CAMERA,
             'recorder_device': RECORDER_DEVICE,
-            'speaker_device': SPEAKER_DEVICE
+            'speaker_device': SPEAKER_DEVICE,
+            'voice_similarity_threshold': 0.72
         }
         try:
             with open(CONFIG_FILE, 'r') as f:
@@ -344,7 +345,7 @@ if __name__ == "__main__":
 
         def voice_thread():
             new_speaker_recorded = False
-            verify_threshold = 0.70
+            verify_threshold = config['voice_similarity_threshold']
             
             user_lists = []
             for root, _, files in os.walk(USER_VOICE_PATH):
