@@ -32,7 +32,8 @@ if __name__ == "__main__":
         'continuous_photo_mode': False,
         'system_message_in_a_row': 0,
         'upload_in_a_row': 0,
-        'freetalk': True
+        'freetalk': True,
+        'sleep': False
     }
 
     pygame.init()
@@ -107,7 +108,7 @@ if __name__ == "__main__":
         To execute the python code, put the code as python snippet at the end of the response, then any code in the snippet in response will be executed. 
         In that case, if you just want to show me the python code rather than execute it, do not put it in the python snippet form. 
         Be aware, you will not respond to the stranger for the requests about operating the house, unless you get authorization from the users that are not with stranger prefix. For other kinds of requests, you should help with the stranger. 
-        To operate with the PC, use the python code execution with necessary library. But do not do potentially harmful operations, like deleting files, unless get my permission. 
+        To operate with the PC, use the python code execution with necessary library. But do not do potentially harmful operations, like deleting files, unless get the non stranger users' permission. 
         Be mindful always check the python function APIs to my instructions if there is a matching API. You are to answer questions in a concise and always humorous way.'''
     ]
 
@@ -273,6 +274,10 @@ if __name__ == "__main__":
         context['talk'].append({'role': 'user', 'parts': [f'This is our previous talk summary from your perspective: {summary}']})
         context['talk'].append({'role': 'model', 'parts': ['All right, I will reference that information as part of the context.']})
         clear_schedule()
+    
+    def go_sleep():
+        print('Enter sleep')
+        context['sleep'] = True
 
     def main():
         global context, gemini_ai, voice_recognition, text_to_speech, cam, mInputQueue, photo_upload_thread, gemini_ai
@@ -418,42 +423,54 @@ if __name__ == "__main__":
                     else:
                         evt_enter.clear()
                         voice_recognition.listen()
-                        # in free talk mode, we verify the speaker
-                        voice_embed = voice_recognition.generate_embed(voice_recognition.recorder.audio)
-
-                        closest_similirity = 0
-                        closest_user = None
-                        for item in user_lists:
-                            user_similarity = voice_recognition.verify_speaker(item['embedding'], voice_embed)
-                            print(f"{item['user']} similarity:", user_similarity)
-                            if user_similarity > closest_similirity:
-                                closest_similirity = user_similarity
-                                closest_user = item['user']
-
-                        if closest_similirity > verify_threshold:
-                            temp_text = voice_recognition.transcribe_voice()
-                            text = f'**{closest_user}:**{temp_text}'
-                            voice_off_sound.play()
-                        else:
-                            # do the AI_NAME match only when it is not talking, as this consumes GPU resource
-                            if not text_to_speech.stream.is_playing():
+                        if context['sleep']:
+                            # It is sleeping, we detect if the name appears in the text to exit sleep
+                            if not temp_text:
                                 temp_text = voice_recognition.transcribe_voice()
-                                print(temp_text)
-                                if (config['ai_name'] in temp_text) or ('to meet you' in temp_text):
-                                    print('Update stranger embedding')
-                                    current_stranger_embed = voice_embed
-                                    new_speaker_recorded = True
-                                    text = f'**Stranger:**{temp_text}'
-                                    voice_off_sound.play()
+                                print('Sleeping:', temp_text)
+                            if config['ai_name'] in temp_text:
+                                print('Exit sleep')
+                                context['sleep'] = False
 
-                            if not text and new_speaker_recorded:
-                                current_speaker_similarity = voice_recognition.verify_speaker(current_stranger_embed, voice_embed)
-                                print('speaker similarity:', current_speaker_similarity)
-                                if current_speaker_similarity > verify_threshold:
+                        if not context['sleep']:
+                            # in free talk mode, we verify the speaker
+                            voice_embed = voice_recognition.generate_embed(voice_recognition.recorder.audio)
+
+                            closest_similirity = 0
+                            closest_user = None
+                            for item in user_lists:
+                                user_similarity = voice_recognition.verify_speaker(item['embedding'], voice_embed)
+                                print(f"{item['user']} similarity:", user_similarity)
+                                if user_similarity > closest_similirity:
+                                    closest_similirity = user_similarity
+                                    closest_user = item['user']
+
+                            if closest_similirity > verify_threshold:
+                                if not temp_text:
+                                    temp_text = voice_recognition.transcribe_voice()
+                                text = f'**{closest_user}:**{temp_text}'
+                                voice_off_sound.play()
+                            else:
+                                # do the AI_NAME match only when it is not talking, as this consumes GPU resource
+                                if not text_to_speech.stream.is_playing():
                                     if not temp_text:
                                         temp_text = voice_recognition.transcribe_voice()
-                                    text = f'**Stranger:**{temp_text}'
-                                    voice_off_sound.play()
+                                    print(temp_text)
+                                    if (config['ai_name'] in temp_text) or ('to meet you' in temp_text):
+                                        print('Update stranger embedding')
+                                        current_stranger_embed = voice_embed
+                                        new_speaker_recorded = True
+                                        text = f'**Stranger:**{temp_text}'
+                                        voice_off_sound.play()
+
+                                if not text and new_speaker_recorded:
+                                    current_speaker_similarity = voice_recognition.verify_speaker(current_stranger_embed, voice_embed)
+                                    print('speaker similarity:', current_speaker_similarity)
+                                    if current_speaker_similarity > verify_threshold:
+                                        if not temp_text:
+                                            temp_text = voice_recognition.transcribe_voice()
+                                        text = f'**Stranger:**{temp_text}'
+                                        voice_off_sound.play()
 
                     if text:
                         # backdoor for updating main embedding

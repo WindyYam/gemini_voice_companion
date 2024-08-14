@@ -120,3 +120,6 @@ get_clipboard_text() -> str
 
 # get the log file of today's conversation, access it when I ask you to write diary
 get_today_conversation() -> str
+
+# enter sleep for the voice module. calling your name will wake that module up
+go_sleep()

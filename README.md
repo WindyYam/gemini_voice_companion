@@ -64,6 +64,7 @@ Then, run the command to install all the other dependencies:
   - Tab key or media play/pause key to start speaking
   - Press the same key again to stop and get a response
 - **Photo Stream Mode**: By normal, you only upload photo if you ask the AI to take a photo. If you ask Gemini to turn this mode on, every single of your request will be attached with a photo from your camera, captured at the very beginning of your voice, to provide a vision-like experience. Use it wisely, as photos take siginificant amount of tokens and time for AI to process.
+- **Sleep Mode**: Tell the companion to go to sleep, it will not react to any voice activity. Only work in Free Talk mode. To wake it up again, use a phrase which contains its name. As usual, longer phrase have better recognition.
 
 ### Activating your voice
 
