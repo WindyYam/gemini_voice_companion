@@ -100,7 +100,7 @@ play_prev_music()
 # stop current music
 stop_music()
 
-# control the user's browser to navigate to a webpage
+# control the user's browser to navigate to a webpage. If it doesn't work, remind the user to try close all Chrome instance.
 navigate_to(url:str)
 
 # turn on/off freetalk mode, if it is on, then the system will continuously convert user voice into text input requests

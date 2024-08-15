@@ -56,6 +56,7 @@ Then, run the command to install all the other dependencies:
 2. Run `./.venv/Scripts/python record_master_wav.py` to record a 15 sec voice sample of a user. You can add multiple users.
 3. Configure through `config.json` for several parameters. You should modify `user_chrome_data_path` to point to your user profile(Which has Spotify logged in)
 4. Run the main script `./.venv/Scripts/python main.py`, or simply double click `run.bat`
+5. When using Chrome related features(such as playing spotify music, navigate webpage), make sure you Google Chrome is closed in the beginning.
 
 ### Modes
 
