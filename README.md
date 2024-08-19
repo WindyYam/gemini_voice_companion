@@ -8,7 +8,7 @@ Or, if you are the one who like to get eyes a bit of rest while still want to ex
 Currently test on Windows only.
 My Laptop is nVidia RTX A500 with 4GB VRAM. So in `voice_recognition.py` I am using the small model of whisper. If your PC is rich in VRAM don't hesitate to use the `large-v2` one.
 
-Quick Rundown: https://youtu.be/Jy-fkp4y7PQ
+Quick Rundown: https://youtu.be/6eXayNvU6ds
 Introduction: https://youtu.be/6NTnIVsfiNM
 In-car usage: https://youtu.be/Fer7pBjVmyA
 Answer phone call(remote usage): https://youtu.be/kon9clc4MDQ
