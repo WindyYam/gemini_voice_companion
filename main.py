@@ -511,7 +511,12 @@ if __name__ == "__main__":
         check_function_file()
         while True:
             try:
-                text = mInputQueue.get()
+                # only fetch the latest text msg
+                if not mInputQueue.empty():
+                    while(not mInputQueue.empty()):
+                        text = mInputQueue.get()
+                else:
+                    text = mInputQueue.get()
                 if text == '':
                     continue
 
