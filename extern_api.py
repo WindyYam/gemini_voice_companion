@@ -176,7 +176,7 @@ def screenshot() -> str:
     # Capture the screenshot
     screenshot = ImageGrab.grab()
 
-    filename = "screenshot.jpg"
+    filename = "temp/screenshot.jpg"
     # Save the screenshot as JPG
     screenshot.save(filename, "JPEG")
     return filename

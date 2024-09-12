@@ -19,7 +19,7 @@ class GeminiAI:
 
     def _initialize_model(self, system_instruction):
         return genai.GenerativeModel(
-            model_name='gemini-1.5-flash',
+            model_name='gemini-1.5-flash-latest',
             safety_settings={
                 HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
                 HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,

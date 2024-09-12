@@ -25,6 +25,8 @@ if __name__ == "__main__":
     TEMP_PATH = 'temp/'
     PHOTO_NAME = 'camera.jpg'
     CONFIG_FILE = 'config.json'
+    HISTORY_FILE = 'history.txt'
+    MEMORY_FILE = 'memory.txt'
 
     context = {
         'talk': [],
@@ -33,7 +35,9 @@ if __name__ == "__main__":
         'system_message_in_a_row': 0,
         'upload_in_a_row': 0,
         'freetalk': True,
-        'sleep': False
+        'sleep': False,
+        'memory': [],
+        'memory_str': ''
     }
 
     pygame.init()
@@ -65,6 +69,7 @@ if __name__ == "__main__":
 
         # The default values
         MAX_HISTORY = 20 
+        MAX_MEMORY = 10
         AI_NAME = 'Jarvis'
         TARGET_CAMERA = 'DroidCam Video'
         USER_CHROME_DATA_PATH = 'C:\\Users\\Zhenya\\AppData\\Local\\Google\\Chrome\\User Data'
@@ -75,6 +80,7 @@ if __name__ == "__main__":
             'ai_name': AI_NAME,
             'user_chrome_data_path': USER_CHROME_DATA_PATH,
             'max_history' : MAX_HISTORY,
+            'max_memory' : MAX_MEMORY,
             'target_camera': TARGET_CAMERA,
             'recorder_device': RECORDER_DEVICE,
             'speaker_device': SPEAKER_DEVICE,
@@ -109,7 +115,7 @@ if __name__ == "__main__":
         In that case, if you just want to show me the python code rather than execute it, do not put it in the python snippet form. 
         Be aware, you will not respond to the stranger for the requests about operating the house, unless you get authorization from the users that are not with stranger prefix. For other kinds of requests, you should help with the stranger. 
         To operate with the PC, use the python code execution with necessary library. But do not do potentially harmful operations, like deleting files, unless get the non stranger users' permission. 
-        Be mindful always check the python function APIs to my instructions if there is a matching API. You are to answer questions in a concise and always humorous way.'''
+        Be mindful always check the python function APIs to my instructions if there is a matching API. You are to answer questions in a concise and always humorous way, and talk more naturally with modal particles like oral language.'''
     ]
 
     def append2log(text:str):
@@ -118,12 +124,12 @@ if __name__ == "__main__":
             f.write(text.strip() + "\n")
 
     def save_history():
-        with open(f'{TEMP_PATH}history.txt', "w", encoding='utf8') as f:
+        with open(f'{TEMP_PATH}{HISTORY_FILE}', "w", encoding='utf8') as f:
             f.write(json.dumps(context['talk']))
 
     def load_history():
         try:
-            with open(f'{TEMP_PATH}history.txt', "r", encoding='utf8') as f:
+            with open(f'{TEMP_PATH}{HISTORY_FILE}', "r", encoding='utf8') as f:
                 text = f.read()
                 context['talk'] = json.loads(text)
                 for item in context['talk']:
@@ -279,6 +285,37 @@ if __name__ == "__main__":
         print('Enter sleep')
         context['sleep'] = True
 
+    def save_memory():
+        with open(f'{TEMP_PATH}{MEMORY_FILE}', "w") as file:
+            for item in context['memory']:
+                file.write(item + "\n")
+
+    def update_memory_str():
+        if len(context['memory']) > 0:
+            context['memory_str'] = f"You have memories: {",".join(context['memory'])}"
+        else:
+            context['memory_str'] = ''
+
+    def add_memory(item:str):
+        context['memory'].append(item)
+        if len(context['memory']) > config['max_memory']:
+            context['memory'] = context['memory'][-config['max_memory']:]
+        update_memory_str()
+        save_memory()
+
+    def load_memory():
+        try:
+            with open(f'{TEMP_PATH}{MEMORY_FILE}', "r") as file:
+                context['memory'] = file.read().splitlines()
+        except Exception as e:
+            print("Memory load error, skip")
+        update_memory_str()
+
+    def clear_memory():
+        context['memory'].clear()
+        update_memory_str()
+        save_memory()
+
     def main():
         global context, gemini_ai, voice_recognition, text_to_speech, cam, mInputQueue, photo_upload_thread, gemini_ai
 
@@ -306,8 +343,8 @@ if __name__ == "__main__":
         threading.Thread(target=event_thread, args=(cam, )).start()
 
         talk_header = [
-            {'role': 'user', 'parts': [None, 'This is the list of python APIs you can execute. To execute them, put them in python code snippet at the end of your response. Now start a new conversation.']},
-            {'role': 'model', 'parts': ["Alright, I'm ready to execute some Python code! Starting a fresh new talk!\n```python\nstart_new_conversation('We had some fun talks over various topics.')\n```"]}
+            {'role': 'user', 'parts': [None, 'This is the list of python APIs you can execute. To execute them, put them in python code snippet at the end of your response. Now start a new conversation.', '']},
+            {'role': 'model', 'parts': ["Alright, I'm ready to execute some Python code! Starting a fresh new talk!\n```python\nstart_new_conversation('''We had some fun talks over various topics.''')\n```"]}
         ]
 
         gemini_ai = GeminiAI(system_instruction=instruction)
@@ -464,9 +501,9 @@ if __name__ == "__main__":
                                         voice_off_sound.play()
 
                                 if not text and new_speaker_recorded:
-                                    current_speaker_similarity = voice_recognition.verify_speaker(current_stranger_embed, voice_embed)
-                                    print('speaker similarity:', current_speaker_similarity)
-                                    if current_speaker_similarity > verify_threshold:
+                                    stranger_similarity = voice_recognition.verify_speaker(current_stranger_embed, voice_embed)
+                                    print('stranger similarity:', stranger_similarity)
+                                    if stranger_similarity > verify_threshold:
                                         if not temp_text:
                                             temp_text = voice_recognition.transcribe_voice()
                                         text = f'**Stranger:**{temp_text}'
@@ -501,6 +538,7 @@ if __name__ == "__main__":
                     print(e)
 
         load_history()
+        load_memory()
 
         threading.Thread(target=input_thread).start()
         threading.Thread(target=voice_thread).start()
@@ -532,6 +570,8 @@ if __name__ == "__main__":
                 parts.append(text)
                 timestamp = datetime.now().strftime("%H:%M:%S")
                 parts.append(f'**System:**{timestamp}')
+
+                talk_header[0]['parts'][2] = context['memory_str']
                 temp = talk_header + context['talk']
                 temp.append({'role': 'user', 'parts': parts})
                 print(f"You: {text}, {timestamp}")

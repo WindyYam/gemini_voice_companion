@@ -38,6 +38,8 @@ Answer phone call(remote usage): https://youtu.be/kon9clc4MDQ
 - **PC Keyboard Control**: Type content onto your PC using voice commands.
 - **Take Picture**: Either take a photo from the camera, or take a screenshot of your PC, which will then get uploaded to gemini. For better experience, recommend to download ```DroidCam https://droidcam.app/``` to turn your mobile phone into a camera.
 - **Write Diary Entry**: It can upload the conversation history today and then you can ask the AI to write diary entry based on that. You will have to explicitly ask the AI to access the history for reference(it is recommended to start a new conversation for AI after that as the history file can be huge which slows down the subsequential requests).
+- **Memorize Information**: It can memorize information and save locally, like the user's preference on music, user's family informations. You can explicitly ask it to remember something. The max number of memory items can be adjusted in `config.json`
+
 - For more detail of the API it can use, see the api_list.txt.
 
 ## Installation
