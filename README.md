@@ -44,7 +44,7 @@ Answer phone call(remote usage): https://youtu.be/kon9clc4MDQ
 
 ## Installation
 
-Make sure your nVidia graphic card is in latest driver.  
+Make sure your nVidia graphic card is in latest driver. Download and put all the content in this repo into a folder.  
 First, install Python 3.12 from https://www.python.org/downloads/ (might work with other version but not tested).  
 Then, simply run `setup.bat` to install all dependencies.  
 
