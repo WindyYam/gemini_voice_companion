@@ -44,21 +44,19 @@ Answer phone call(remote usage): https://youtu.be/kon9clc4MDQ
 
 ## Installation
 
-First, you should create a virtual env on this folder for your convience.
-Then, install cuda 12.1 package with this command(make sure your nVidia driver is the latest): 
-
-```./.venv/Scripts/pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121```
-
-Then, run the command to install all the other dependencies:
-```./.venv/Scripts/pip install -r requirements.txt```
+Make sure your nVidia graphic card is in latest driver.
+First, install Python 3.12 from https://www.python.org/downloads/ (might work with other version but not tested).
+Then, simply run `setup.bat` to install all dependencies.
 
 ## Usage
 
-1. Get the Gemini API key and put it in environment variable as GEMINI_API_KEY (or you can simply replace it in the source code `gemini_ai.py`, not recommended)
-2. Run `./.venv/Scripts/python record_master_wav.py` to record a 15 sec voice sample of a user. You can add multiple users.
-3. Configure through `config.json` for several parameters. You should modify `user_chrome_data_path` to point to your user profile(Which has Spotify logged in)
-4. Run the main script `./.venv/Scripts/python main.py`, or simply double click `run.bat`
-5. When using Chrome related features(such as playing spotify music, navigate webpage), make sure you Google Chrome is closed in the beginning.
+1. Get the Gemini API key here `https://aistudio.google.com/app/apikey` and: 
+  (recommended) put it in environment variable as GEMINI_API_KEY (please search for detail on how to add environment variable if you are not familiar with).
+  (not recommended) add a new line in `run.bat` at beginning: set GEMINI_API_KEY=(your Gemini API key)
+2. Run `manage_user.bat` to add/delete user voice for AI to recognize. You can add multiple users.
+3. Configure through `config.json` for several parameters. You should modify `user_chrome_data_path` to point to your chrome user profile(Which has Spotify logged in). Typically just replace "Zhenya" with your Windows account name.
+4. Run `run.bat`. Make sure you've added GEMINI_API_KEY variable in step 1.
+5. When using Chrome related features(such as playing spotify music, navigate webpage), make sure you have Google Chrome installed, Spotify logged in, and Chrome is closed before doing AI Chrome features.
 
 ### Modes
 

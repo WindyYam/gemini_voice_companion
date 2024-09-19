@@ -1,1 +1,1 @@
-.\.venv\Scripts\python.exe main.py config.json
+.\.venv\Scripts\python.exe scripts/main.py config.json
