@@ -44,15 +44,15 @@ Answer phone call(remote usage): https://youtu.be/kon9clc4MDQ
 
 ## Installation
 
-Make sure your nVidia graphic card is in latest driver.
-First, install Python 3.12 from https://www.python.org/downloads/ (might work with other version but not tested).
-Then, simply run `setup.bat` to install all dependencies.
+Make sure your nVidia graphic card is in latest driver.  
+First, install Python 3.12 from https://www.python.org/downloads/ (might work with other version but not tested).  
+Then, simply run `setup.bat` to install all dependencies.  
 
 ## Usage
 
-1. Get the Gemini API key here `https://aistudio.google.com/app/apikey` and: 
-  (recommended) put it in environment variable as GEMINI_API_KEY (please search for detail on how to add environment variable if you are not familiar with).
-  (not recommended) add a new line in `run.bat` at beginning: set GEMINI_API_KEY=(your Gemini API key)
+1. Get the Gemini API key here `https://aistudio.google.com/app/apikey` and:   
+  (recommended) put it in environment variable as GEMINI_API_KEY (please search for detail on how to add environment variable if you are not familiar with).  
+  (not recommended) add a new line in `run.bat` at beginning: set GEMINI_API_KEY=(your Gemini API key)  
 2. Run `manage_user.bat` to add/delete user voice for AI to recognize. You can add multiple users.
 3. Configure through `config.json` for several parameters. You should modify `user_chrome_data_path` to point to your chrome user profile(Which has Spotify logged in). Typically just replace "Zhenya" with your Windows account name.
 4. Run `run.bat`. Make sure you've added GEMINI_API_KEY variable in step 1.
