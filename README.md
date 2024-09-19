@@ -52,10 +52,10 @@ Then, simply run `setup.bat` to install all dependencies.
 
 1. Get the Gemini API key here `https://aistudio.google.com/app/apikey` and:   
   (recommended) put it in environment variable as GEMINI_API_KEY (please search for detail on how to add environment variable if you are not familiar with).  
-  (not recommended) add a new line in `run.bat` at beginning: set GEMINI_API_KEY=(your Gemini API key)  
+  (not recommended) do nothing, and `run.bat` will prompt you to enter GEMINI_API_KEY at the beginning every time.
 2. Run `manage_user.bat` to add/delete user voice for AI to recognize. You can add multiple users.
 3. Configure through `config.json` for several parameters. You should modify `user_chrome_data_path` to point to your chrome user profile(Which has Spotify logged in). Typically just replace "Zhenya" with your Windows account name.
-4. Run `run.bat`. Make sure you've added GEMINI_API_KEY variable in step 1.
+4. Run `run.bat`. Make sure you've GEMINI_API_KEY variable in step 1.
 5. When using Chrome related features(such as playing spotify music, navigate webpage), make sure you have Google Chrome installed, Spotify logged in, and Chrome is closed before doing AI Chrome features.
 
 ### Modes
