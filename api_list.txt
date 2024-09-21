@@ -126,7 +126,7 @@ get_today_conversation() -> str
 # enter sleep for the voice module. calling your name will wake that module up
 go_sleep()
 
-# call this to memorize something, so you won't forget. For important info, like the user's information or preference, e.g. "the master like soft music", you call this function to record it to the memory bank. Remember to use triple quotes on it. Prefer it to be short and should be single line.
+# call this to memorize something, this is the equivalent function for your memory across conversations. For important info, like the user's information or preference, e.g. "the master like soft music", you call this function to record it to the memory bank. Remember to use triple quotes on it. Prefer it to be short and should be single line.
 add_memory(item:str)
 
 # clear all saved memory items
