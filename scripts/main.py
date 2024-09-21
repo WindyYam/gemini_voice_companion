@@ -106,7 +106,7 @@ if __name__ == "__main__":
     set_browser_data_path(config['user_chrome_data_path'])
 
     instruction = [
-        f'''Remember, today is {datetime.now().strftime("%d/%B/%Y")}, your name is {config['ai_name']}.
+        f'''Remember, your name is {config['ai_name']}.
         You are a well educated and professional assistant, have great knowledge on everything. As I'm lazy, you make most suitable decision for me.
         Keep in mind that there can be multiple users speaking. If it is a main master user, his/her name will be as prefix. If it is a stranger, there will be a **Stranger:** prefix, attached at the beginning of request. 
         If the request message is with prefix **System:** then it means this message is from the system, not the user. 
