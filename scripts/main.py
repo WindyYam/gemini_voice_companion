@@ -143,7 +143,7 @@ if __name__ == "__main__":
             print(e)
             context['talk'] = []
 
-    def push_variable(*values: object,
+    def system_message(*values: object,
             sep: str | None = " ",
             end: str | None = "\n",
             flush: Literal[False] = False):
@@ -208,7 +208,7 @@ if __name__ == "__main__":
             fail_sound.play()
             err_msg = f'Code exec exception: {e}'
             print(err_msg)
-            push_variable(err_msg)
+            system_message(err_msg)
 
     def event_thread(cam: pygame.camera.Camera):
         clock = pygame.time.Clock()

@@ -1,6 +1,6 @@
 # This file contains python APIs to be used in code snippet for execution
 # The code in python code snippet in your response will get automatically executed
-# important! To read any value from code execution to the conversation, use push_variable(val) on the value, which forces system to relay the information to you.
+# important! To read any value from code execution to the conversation, use system_message(val) on the value, which forces system to relay the information to you.
 
 ##########################################################
 # APIs for controlling
@@ -19,7 +19,7 @@ setFanSpeed(speed:int)
 
 ##########################################################
 # APIs for getting information that you don't know
-# At the end, to get the information, you should use push_variable(value) on the returned value, which force system to send the value to you
+# At the end, to get the information, you should use system_message(value) on the returned value, which force system to send the value to you
 # When searching for news, remember always try to summarize highlights in median detail of what you have found
 ##########################################################
 # check for all house smart appliance status
@@ -39,18 +39,20 @@ get_webpage_text(url:str)->str
 # Python library access you have
 #########################################################
 # for http request
-request
+import request
+# for time and date
+from datetime import datetime, date, timedelta
 
 ##########################################################
 # apart from the above APIs, you also get access to the following python function API:
 ##########################################################
 # Call when you want to read any variable or photo. This forcees the system to send the value message for you to read. No return value, the value will be in the next request for you from the system, it is not from me, I'm totally unawared of the system message.
-push_variable(value)
+system_message(value)
 
-# turning on/off continuous photo capture & upload mode on every talk to you, arg is True/False. When it is set on, be aware that you don't need push_variable() for the photo
+# turning on/off continuous photo capture & upload mode on every talk to you, arg is True/False. When it is set on, be aware that you don't need system_message() for the photo
 photo_stream_mode(on)
 
-# capturing the photo through camera. this return the photo instance. when I order you to look, you can take one photo then analyze the file. To read that photo file, put push_variable(photo_instance) in the code snippet to force an upload of that photo to you. Do this only when I ask you to.
+# capturing the photo through the camera. this return the photo instance. To read that photo file, put system_message(photo_instance) in the code snippet to force an upload of that photo to you for analysis. Do this only when I ask you to.
 capture_photo() -> str
 
 # switch voice system to user voice to mimic the user's voice tone only, and your personality keeps unchanged.
@@ -109,7 +111,7 @@ freetalk_mode(on:bool)
 # call this to summarize our talk history, and start a new conversation with the summary. you should generate the detailed summary of all our talk history as argument, and always use raw triple quotes """ for the text.
 start_new_conversation(summary:str)
 
-# take the screenshot, return the image file, which can then be called with push_variable() for you to read
+# take the screenshot of the PC you are running on, return the image file, which can then be called with system_message() for you to read
 screenshot() -> str
 
 # type in the text using keyboard API into the PC. Always use raw triple quotes """ for the text.

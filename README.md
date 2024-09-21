@@ -51,7 +51,7 @@ After that, simply run `setup.bat` to install all dependencies.
 
 ## Usage
 
-1. This is Google Gemini AI and I'm not gonna use my API key here (unless I'm going to charge you for the excess usage beyond free tier). So you should get the (free) Gemini API key here `https://aistudio.google.com/app/apikey` and either:   
+1. This is Google Gemini AI which has free tier usage enough for a single user. I'm not gonna use my API key here (unless I'm going to charge you for the excess usage beyond free tier). So you should get the (free) Gemini API key here `https://aistudio.google.com/app/apikey` and either:   
   (recommended) put it in environment variable as GEMINI_API_KEY (please search for detail on how to add environment variable if you are not familiar with). Or  
   (not recommended) do nothing, and `run.bat` will prompt you to enter GEMINI_API_KEY at the beginning every time.
 2. Run `manage_user.bat` to add/delete user voice for AI to recognize. You can add multiple users.
