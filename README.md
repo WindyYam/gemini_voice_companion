@@ -44,13 +44,14 @@ Answer phone call(remote usage): https://youtu.be/kon9clc4MDQ
 
 ## Installation
 
-Make sure your nVidia graphic card is in latest driver. Download and put all the content in this repo into a folder.  
-First, install Python 3.12 from https://www.python.org/downloads/ (might work with other version but not tested).  
-Then, simply run `setup.bat` to install all dependencies.  
+Make sure your nVidia graphic card is in latest driver.  
+Download this repo and put all the content into a folder.  
+Then first, install Python 3.12 from https://www.python.org/downloads/ (might work with other version but not tested).  
+After that, simply run `setup.bat` to install all dependencies.  
 
 ## Usage
 
-1. Get the Gemini API key here `https://aistudio.google.com/app/apikey` and either:   
+1. This is Google Gemini AI and I'm not gonna use my API key here (unless I'm going to charge you for the excess usage beyond free tier). So you should get the (free) Gemini API key here `https://aistudio.google.com/app/apikey` and either:   
   (recommended) put it in environment variable as GEMINI_API_KEY (please search for detail on how to add environment variable if you are not familiar with). Or  
   (not recommended) do nothing, and `run.bat` will prompt you to enter GEMINI_API_KEY at the beginning every time.
 2. Run `manage_user.bat` to add/delete user voice for AI to recognize. You can add multiple users.

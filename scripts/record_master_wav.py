@@ -21,7 +21,7 @@ stream = p.open(format=FORMAT,
                 input=True,
                 frames_per_buffer=CHUNK)
 
-username = input("Please enter the user name (recommend to be in the format Name,Gender, e.g. Zhenya,male):")
+username = input("Please enter the user name (recommend to be in the format Name(Gender), e.g. Zhenya(male)):")
 print(f"We are going to record {RECORD_SECONDS} seconds voice for {username}.")
 for i in [3, 2, 1]:
     print(f"* Recording will start in {i} seconds...")
