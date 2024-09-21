@@ -28,12 +28,12 @@ class VoiceRecognition:
             'post_speech_silence_duration': 0.2,
             'min_length_of_recording': 0.5,
             'min_gap_between_recordings': 0,
-            "compute_type" : "auto",
+            "compute_type" : "default",
             'input_device_index': device_index,
             'on_recording_start':on_recording_start
         }
         self.recorder = AudioToTextRecorder(**self.recorder_config)
-        self.encoder = VoiceEncoder()
+        self.encoder = VoiceEncoder('cpu')
 
     def generate_embed(self, audio):
         return self.encoder.embed_utterance(preprocess_wav(audio))

@@ -344,7 +344,7 @@ if __name__ == "__main__":
 
         talk_header = [
             {'role': 'user', 'parts': [None, 'This is the list of python APIs you can execute. To execute them, put them in python code snippet at the end of your response. Now start a new conversation.', '']},
-            {'role': 'model', 'parts': ["Alright, I'm ready to execute some Python code! Starting a fresh new talk!\n```python\nstart_new_conversation('''We had some fun talks over various topics.''')\n```"]}
+            {'role': 'model', 'parts': ['''Alright, I'm ready to execute some Python code! Starting a fresh new talk!\n```python\nstart_new_conversation("""We had some fun talks over various topics.""")\n```''']}
         ]
 
         gemini_ai = GeminiAI(system_instruction=instruction)
@@ -508,7 +508,6 @@ if __name__ == "__main__":
                                             temp_text = voice_recognition.transcribe_voice()
                                         text = f'**Stranger:**{temp_text}'
                                         voice_off_sound.play()
-
                     if text:
                         # backdoor for updating main embedding
                         if config['ai_name'] in text and 'master' in temp_text:
@@ -575,6 +574,7 @@ if __name__ == "__main__":
                 temp = talk_header + context['talk']
                 temp.append({'role': 'user', 'parts': parts})
                 print(f"You: {text}, {timestamp}")
+
                 # Process user's request
                 try:
                     response = gemini_ai.generate_response(temp)
