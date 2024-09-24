@@ -56,6 +56,7 @@ if __name__ == "__main__":
     voice_on_sound.set_volume(0.5)
     voice_off_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}confirm.mp3")
     voice_off_sound.set_volume(0.5)
+    start_up_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}startup.mp3")
     today = str(date.today())
     evt_enter = threading.Event()
 
@@ -576,6 +577,7 @@ if __name__ == "__main__":
         threading.Thread(target=voice_thread).start()
         
         # Main loop
+        start_up_sound.play()
         text_to_speech.speak(f"{config['ai_name']}, online. How can I help you?")
         append2log('==================New=====================')
         check_function_file()
