@@ -31,13 +31,14 @@ if __name__ == "__main__":
     context = {
         'talk': [],
         'upload_file': None,
-        'continuous_photo_mode': False,
+        'vision_mode': False,
         'system_message_in_a_row': 0,
         'upload_in_a_row': 0,
         'freetalk': True,
         'sleep': False,
         'memory': [],
-        'memory_str': ''
+        'memory_str': '',
+        'vision_mode_camrea_is_screen' : False    # This will work with Discord video call to capture the video screen as the AI's vision, in this case you are on the other end of discord chat holding the phone camera
     }
 
     pygame.init()
@@ -84,7 +85,7 @@ if __name__ == "__main__":
             'target_camera': TARGET_CAMERA,
             'recorder_device': RECORDER_DEVICE,
             'speaker_device': SPEAKER_DEVICE,
-            'voice_similarity_threshold': 0.72
+            'voice_similarity_threshold': 0.72,
         }
         try:
             with open(CONFIG_FILE, 'r') as f:
@@ -150,7 +151,7 @@ if __name__ == "__main__":
         string_output = io.StringIO()
         print(*values, file=string_output, sep=sep, end=end, flush=flush)
         response = string_output.getvalue().strip()
-        if context['continuous_photo_mode'] and PHOTO_NAME in response:
+        if context['vision_mode'] and PHOTO_NAME in response:
             print('In photo stream mode, no need to upload capture photo here.')
             return
         if context['system_message_in_a_row'] < 2 and context['upload_in_a_row'] < 1:
@@ -172,12 +173,20 @@ if __name__ == "__main__":
         else:
             print("Too many system message call in a row!")
 
-    def photo_stream_mode(on:bool):
+    def vision_mode(on:bool):
         if(on):
-            cam.start()
-            context['continuous_photo_mode'] = True
+            if not context['vision_mode_camrea_is_screen']:
+                cam.start()
+            context['vision_mode'] = True
         else:
-            context['continuous_photo_mode'] = False
+            context['vision_mode'] = False
+            cam.stop()
+
+    def switch_camrea_to_screenshot(on:bool):
+        context['vision_mode_camrea_is_screen'] = on
+        if (not on) and context['vision_mode']:
+            cam.start()
+        else:
             cam.stop()
             
     def capture_photo()->str:
@@ -188,9 +197,35 @@ if __name__ == "__main__":
         # saving the image 
         pygame.image.save(img, photo_path)
         return photo_path
+    
+    def screenshot() -> str:
+        from PIL import ImageGrab, Image
 
+        # Capture the screenshot
+        screenshot = ImageGrab.grab()
+
+        if context['vision_mode'] and context['vision_mode_camrea_is_screen']:
+            # In this mode, we scale down to half size, as the main purpose of this mode is to get the live video snapshot from discord video chat, which is actually low res
+            width, height = screenshot.size
+
+            # Calculate the new dimensions (half of the original)
+            new_width = width // 2
+            new_height = height // 2
+
+            # Resize the image to half resolution
+            screenshot = screenshot.resize((new_width, new_height), Image.LANCZOS)
+        filename = "temp/screenshot.jpg"
+
+        # Save the screenshot as JPG
+        screenshot.save(filename, "JPEG")
+        return filename
+    
     def capture_upload_photo():
-        filename = capture_photo()
+        if context['vision_mode_camrea_is_screen']:
+            filename = screenshot()
+        else:
+            filename = capture_photo()
+
         previous = context['upload_file']
         context['upload_file'] = gemini_ai.upload_file(path=filename,
                             display_name="Photo")
@@ -361,12 +396,10 @@ if __name__ == "__main__":
         def on_record_start():
             if not context['freetalk']:
                 text_to_speech.stop()
-            if context['continuous_photo_mode']:
+            if context['vision_mode']:
                 global photo_upload_thread
                 photo_upload_thread = threading.Thread(target=capture_upload_photo)
                 photo_upload_thread.start()
-            else:
-                cam.start()
 
         photo_upload_thread = None
         text_to_speech = TextToSpeech(SOUNDS_PATH, device_name=config['speaker_device'])
@@ -381,7 +414,7 @@ if __name__ == "__main__":
                 text = f'**Master:**{text}'
                 context['system_message_in_a_row'] = 0
                 context['upload_in_a_row'] = 0
-                if context['continuous_photo_mode']:
+                if context['vision_mode']:
                     capture_upload_photo()
                 mInputQueue.put(text)
 
@@ -614,7 +647,7 @@ if __name__ == "__main__":
                     thread.join()
                 
                 # conserve energy
-                if not context['continuous_photo_mode']:
+                if not context['vision_mode']:
                     cam.stop()
 
             except Exception as e:

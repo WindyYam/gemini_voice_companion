@@ -37,8 +37,9 @@ Answer phone call(remote usage): https://youtu.be/kon9clc4MDQ
 - **Spotify Integration**: Play and control music on Spotify.
 - **PC Keyboard Control**: Type content onto your PC using voice commands.
 - **Take Picture**: Either take a photo from the camera, or take a screenshot of your PC, which will then get uploaded to gemini. For better experience, recommend to download ```DroidCam https://droidcam.app/``` to turn your mobile phone into a camera.
+- **Vision Mode**: Attach photo on every of your request to the AI to provide vision context, either from the camrea or from screenshot (if you are doing discord video chat with the AI, the screenshot let the AI see the video screenshot from the other end)
 - **Write Diary Entry**: It can upload the conversation history today and then you can ask the AI to write diary entry based on that. You will have to explicitly ask the AI to access the history for reference(it is recommended to start a new conversation for AI after that as the history file can be huge which slows down the subsequential requests).
-- **Memorize Information**: It can memorize information and save locally, like the user's preference on music, user's family informations. You can explicitly ask it to remember something. The max number of memory items can be adjusted in `config.json`
+- **Memorize Information**: It can memorize information and save locally, like the user's preference on music, user's family informations. You can explicitly ask it to remember something or write something down. The max number of memory items can be adjusted in `config.json`
 
 - For more detail of the API it can use, see the api_list.txt.
 
@@ -65,7 +66,7 @@ After that, simply run `setup.bat` to install all dependencies.
 - **Trigger Mode**: Disable free talk mode by saying "Turn off free talk mode". Then use:
   - Tab key or media play/pause key to start speaking
   - Press the same key again to stop and get a response
-- **Photo Stream Mode**: By normal, you only upload photo if you ask the AI to take a photo. If you ask Gemini to turn this mode on, every single of your request will be attached with a photo from your camera, captured at the very beginning of your voice, to provide a vision-like experience. Use it wisely, as photos take siginificant amount of tokens and time for AI to process.
+- **Vision Mode**: By normal, you only upload photo if you ask the AI to take a photo. If you ask Gemini to turn this mode on, every single of your request will be attached with a photo from your camera, captured at the very beginning of your voice, to provide a vision-like experience. Use it wisely, as photos take siginificant amount of tokens and time for AI to process. You can ask the AI to switch to screenshot instead of camrea, which works very well with Discord video chat (you are the one to video chat with the AI).
 - **Sleep Mode**: Tell the companion to go to sleep, it will not react to any voice activity. Only work in Free Talk mode. To wake it up again, use a phrase which contains its name. As usual, longer phrase have better recognition.
 
 ### Activating your voice
@@ -84,6 +85,7 @@ After that, simply run `setup.bat` to install all dependencies.
 ## Tip
 
 - The Free talk mode does continuous voice sample analysis thus is (slightly more) energy hunger if you are taking your laptop with only battery and in noisy environment. The trigger mode works better in this scenario.
+- You can setup your PC to make Gemini answer Discord voice call/video call, in this case you are accessing the AI service remotely with your mobile phone, which is a huge benefit. See the Answer Phone Call youtube introduction ahead.
 - Sometimes Gemini can be carried away by the context thus forgot to call function for a specific task, you should remind it about the function access like "Have you forgot you had function API access?". I have no good solution to this yet.
 - Normally, longer phrase can be easier for the voice recognition.
 - The voice break to consider as a speech is short, so try to avoid long break in one speech. If you do want to extend it, try connect with voice like "eh.." instead of blank.

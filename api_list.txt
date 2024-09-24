@@ -49,8 +49,8 @@ from datetime import datetime, date, timedelta
 # Call when you want to read any variable or photo. This forcees the system to send the value message for you to read. No return value, the value will be in the next request for you from the system, it is not from me, I'm totally unawared of the system message.
 system_message(value)
 
-# turning on/off continuous photo capture & upload mode on every talk to you, arg is True/False. When it is set on, be aware that you don't need system_message() for the photo
-photo_stream_mode(on)
+# turning on/off vision mode so it will attach a photo on every request to you as your vision, arg is True/False. When it is set on, be aware that you don't need system_message() for the photo
+vision_mode(on)
 
 # capturing the photo through the camera. this return the photo instance. To read that photo file, put system_message(photo_instance) in the code snippet to force an upload of that photo to you for analysis. Do this only when I ask you to.
 capture_photo() -> str
@@ -113,6 +113,9 @@ start_new_conversation(summary:str)
 
 # take the screenshot of the PC you are running on, return the image file, which can then be called with system_message() for you to read
 screenshot() -> str
+
+# switch to use screenshot instead of camrea image in vision mode. Be aware the screenshot in vision mode is in half resolution
+switch_camrea_to_screenshot(on:bool)
 
 # type in the text using keyboard API into the PC. Always use raw triple quotes """ for the text.
 keyboard_type_text(text: str)

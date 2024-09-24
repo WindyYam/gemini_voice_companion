@@ -170,17 +170,6 @@ def play_prev_music():
     finally:
         pass
 
-def screenshot() -> str:
-    from PIL import ImageGrab
-
-    # Capture the screenshot
-    screenshot = ImageGrab.grab()
-
-    filename = "temp/screenshot.jpg"
-    # Save the screenshot as JPG
-    screenshot.save(filename, "JPEG")
-    return filename
-
 def keyboard_type_text(text: str):
     import keyboard
     keyboard.write(text)
