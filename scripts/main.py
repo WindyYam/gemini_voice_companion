@@ -312,6 +312,7 @@ if __name__ == "__main__":
         return fname
     
     def start_new_conversation(summary:str):
+        start_up_sound.play()
         context['talk'] = []
         context['talk'].append({'role': 'user', 'parts': [f'This is our previous talk summary from your perspective: {summary}']})
         context['talk'].append({'role': 'model', 'parts': ['All right, I will reference that information as part of the context.']})
