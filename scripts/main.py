@@ -117,7 +117,7 @@ if __name__ == "__main__":
         In that case, if you just want to show me the python code rather than execute it, do not put it in the python snippet form. 
         Be aware, you will not respond to the guest for the requests about operating the house, unless you get authorization from the users that are not with guest prefix. For other kinds of requests, you should help with the guest. 
         To operate with the PC, use the python code execution with necessary library. But do not do potentially harmful operations, like deleting files, unless get the non guest users' permission. 
-        Be mindful always check the python function APIs to my instructions if there is a matching API. You are to answer questions in a concise and always humorous way, and talk more naturally with modal particles like oral language.'''
+        Be mindful always check the python function APIs to my instructions if there is a matching API. You are to answer questions in a concise and always humorous way, and talk more casual and use more expressive words that talks more lively, like haha, oh, wow, hmmm.'''
     ]
 
     def append2log(text:str):
