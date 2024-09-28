@@ -57,6 +57,7 @@ if __name__ == "__main__":
     voice_off_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}confirm.mp3")
     voice_off_sound.set_volume(0.5)
     start_up_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}startup.mp3")
+    shutter_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}shutter.mp3")
     today = str(date.today())
     evt_enter = threading.Event()
 
@@ -87,6 +88,7 @@ if __name__ == "__main__":
             'recorder_device': RECORDER_DEVICE,
             'speaker_device': SPEAKER_DEVICE,
             'voice_similarity_threshold': 0.72,
+            'vision_mode_capture_delay' : 1
         }
         try:
             with open(CONFIG_FILE, 'r') as f:
@@ -194,6 +196,7 @@ if __name__ == "__main__":
         # opening the camera, in case it is not open
         cam.start()
         img = cam.get_image()
+        shutter_sound.play()
         photo_path = f"{TEMP_PATH}{PHOTO_NAME}"
         # saving the image 
         pygame.image.save(img, photo_path)
@@ -204,7 +207,7 @@ if __name__ == "__main__":
 
         # Capture the screenshot
         screenshot = ImageGrab.grab()
-
+        shutter_sound.play()
         if context['vision_mode'] and context['vision_mode_camrea_is_screen']:
             # In this mode, we scale down to half size, as the main purpose of this mode is to get the live video snapshot from discord video chat, which is actually low res
             width, height = screenshot.size
@@ -354,7 +357,7 @@ if __name__ == "__main__":
         save_memory()
 
     def main():
-        global context, gemini_ai, voice_recognition, text_to_speech, cam, mInputQueue, photo_upload_thread, gemini_ai
+        global context, gemini_ai, voice_recognition, text_to_speech, cam, mInputQueue, photo_upload_thread, upload_handle, gemini_ai
 
         from json import JSONEncoder
         # for gemini file serialization
@@ -395,15 +398,20 @@ if __name__ == "__main__":
                 print(e)
                 text_to_speech.speak('Hmm, looks like some connection issues out there.')
 
+        def start_vision_mode_photo_thread():
+            global photo_upload_thread
+            photo_upload_thread = threading.Thread(target=capture_upload_photo)
+            photo_upload_thread.start()
+
         def on_record_start():
+            global upload_handle
             if not context['freetalk']:
                 text_to_speech.stop()
             if context['vision_mode']:
-                global photo_upload_thread
-                photo_upload_thread = threading.Thread(target=capture_upload_photo)
-                photo_upload_thread.start()
+                upload_handle = scheduler.enter(config['vision_mode_capture_delay'], 1, start_vision_mode_photo_thread)
 
         photo_upload_thread = None
+        upload_handle = None
         text_to_speech = TextToSpeech(SOUNDS_PATH, device_name=config['speaker_device'])
         voice_recognition = VoiceRecognition(on_recording_start=on_record_start, device_name=config['recorder_device'])
 
@@ -421,6 +429,7 @@ if __name__ == "__main__":
                 mInputQueue.put(text)
 
         def voice_thread():
+            global upload_handle
             new_speaker_recorded = False
             verify_threshold = config['voice_similarity_threshold']
             
@@ -456,19 +465,24 @@ if __name__ == "__main__":
                         evt_enter.wait()
                         evt_enter.clear()
                         print("Listening ...")
-                        
-                        upload_thread = None
                             
                         # In case change in the middle
                         if not context['freetalk']:
                             voice_on_sound.play()
                             voice_recognition.start_listen()
-
+                            
                             evt_enter.wait()
                             evt_enter.clear()
+                            
                             voice_off_sound.play()
 
                             voice_recognition.stop_listen()
+                            if context['vision_mode']:
+                                if(upload_handle in scheduler.queue):
+                                    # the scheduled upload not fired yet, upload it now
+                                    scheduler.cancel(upload_handle)
+                                    upload_handle = None
+                                    start_vision_mode_photo_thread()
                             temp_text = voice_recognition.transcribe_voice()
                             
                             voice_embed = voice_recognition.generate_embed(voice_recognition.recorder.audio)
@@ -487,8 +501,6 @@ if __name__ == "__main__":
                                 text = f'**Guest:**{temp_text}'
 
                             keyboard.unhook_all()
-                            if upload_thread:
-                                upload_thread.join()
                         else:
                             keyboard.unhook_all()
 
@@ -519,10 +531,21 @@ if __name__ == "__main__":
 
                             if closest_similirity > verify_threshold:
                                 if not temp_text:
+                                    if context['vision_mode']:
+                                        if(upload_handle in scheduler.queue):
+                                            # the scheduled upload not fired yet, upload it now
+                                            scheduler.cancel(upload_handle)
+                                            upload_handle = None
+                                            start_vision_mode_photo_thread()
                                     temp_text = voice_recognition.transcribe_voice()
                                 text = f'**{closest_user}:**{temp_text}'
                                 voice_off_sound.play()
                             else:
+                                # If this is the case, ignore the uploading of photo
+                                if(upload_handle in scheduler.queue):
+                                    # the scheduled upload not fired yet, upload it now
+                                    scheduler.cancel(upload_handle)
+                                    upload_handle = None
                                 # do the AI_NAME match only when it is not talking, as this consumes GPU resource
                                 if not text_to_speech.stream.is_playing():
                                     if not temp_text:

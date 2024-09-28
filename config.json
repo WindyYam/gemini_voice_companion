@@ -6,5 +6,6 @@
   "target_camera": "DroidCam Video",
   "recorder_device": null,
   "speaker_device": null,
-  "voice_similarity_threshold": 0.72
+  "voice_similarity_threshold": 0.72,
+  "vision_mode_capture_delay": 1
 }

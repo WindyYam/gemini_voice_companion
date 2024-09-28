@@ -66,7 +66,7 @@ After that, simply run `setup.bat` to install all dependencies.
 - **Trigger Mode**: Disable free talk mode by saying "Turn off free talk mode". Then use:
   - Tab key or media play/pause key to start speaking
   - Press the same key again to stop and get a response
-- **Vision Mode**: By normal, you only upload photo if you ask the AI to take a photo. If you ask Gemini to turn this mode on, every single of your request will be attached with a photo from your camera, captured at the very beginning of your voice, to provide a vision-like experience. Use it wisely, as photos take siginificant amount of tokens and time for AI to process. You can ask the AI to switch to screenshot instead of camrea, which works very well with Discord video chat (you are the one to video chat with the AI).
+- **Vision Mode**: By normal, you only upload photo if you ask the AI to take a photo. If you ask Gemini to turn this mode on, every single of your request will be attached with a photo from your camera, captured at the very beginning of your voice, to provide a vision-like experience. Use it wisely, as photos take siginificant amount of tokens and time for AI to process. You can ask the AI to switch to screenshot vision mode instead of default camrea vision mode, which works very well with Discord video chat (you are the one to video chat with the AI).
 - **Sleep Mode**: Tell the companion to go to sleep, it will not react to any voice activity. Only work in Free Talk mode. To wake it up again, use a phrase which contains its name. As usual, longer phrase have better recognition.
 
 ### Activating your voice
