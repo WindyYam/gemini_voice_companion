@@ -58,6 +58,7 @@ if __name__ == "__main__":
     voice_off_sound.set_volume(0.5)
     start_up_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}startup.mp3")
     shutter_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}shutter.mp3")
+    recurring_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}recurring.mp3")
     today = str(date.today())
     evt_enter = threading.Event()
 
@@ -192,7 +193,7 @@ if __name__ == "__main__":
         else:
             cam.stop()
             
-    def capture_photo()->str:
+    def camera_shot()->str:
         # opening the camera, in case it is not open
         cam.start()
         img = cam.get_image()
@@ -228,7 +229,7 @@ if __name__ == "__main__":
         if context['vision_mode_camrea_is_screen']:
             filename = screenshot()
         else:
-            filename = capture_photo()
+            filename = camera_shot()
 
         previous = context['upload_file']
         context['upload_file'] = gemini_ai.upload_file(path=filename,
@@ -263,6 +264,15 @@ if __name__ == "__main__":
         print('Event')
         event_sound.play()
         cb(*arg)
+    
+    def recurring_wrapper(interval_sec, cb, arg=()):
+        print('Recurring event')
+        recurring_sound.play()
+        cb(*arg)
+        scheduler.enter(interval_sec, 1, recurring_wrapper, argument=(interval_sec, cb, arg))
+
+    def schedule_recurring(interval_sec, cb, arg=()):
+        scheduler.enter(interval_sec, 1, recurring_wrapper, argument=(interval_sec, cb, arg))
 
     def schedule(dt:datetime, cb, arg=()):
         secs = (dt - datetime.now()).total_seconds()
@@ -422,8 +432,6 @@ if __name__ == "__main__":
             while True:
                 text = input()
                 text = f'**Master:**{text}'
-                context['system_message_in_a_row'] = 0
-                context['upload_in_a_row'] = 0
                 if context['vision_mode']:
                     capture_upload_photo()
                 mInputQueue.put(text)
@@ -588,8 +596,6 @@ if __name__ == "__main__":
                                 user_lists.append({'user': 'Master', 'embedding': voice_embed})
                             # sound
                             print('\a')
-                        context['system_message_in_a_row'] = 0
-                        context['upload_in_a_row'] = 0
                         mInputQueue.put(text)
                 except Exception as e:
                     print(e)
@@ -663,6 +669,10 @@ if __name__ == "__main__":
                     thread = threading.Thread(target=exec_code, args=(pythoncode,))
                     # Start the thread
                     thread.start()
+                else:
+                    # no code this round, clear some flags
+                    context['system_message_in_a_row'] = 0
+                    context['upload_in_a_row'] = 0
                 # Speak the response
                 if voice_text != '':
                     text_to_speech.speak(voice_text)

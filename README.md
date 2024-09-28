@@ -29,6 +29,7 @@ Answer phone call(remote usage): https://youtu.be/kon9clc4MDQ
 - **Voice Switching**: Change the companion's voice on command (e.g., mimic user's voice, switch to Darth Vader's voice. See `api_list.txt` for more.).
 - **House Managing**: Smart house like operation through voice command. It is simulated by pygame as a simple GUI. You can open door, turn on light, etc.
 - **Reminder Schedule**: Schedule a voice reminder or an alarm at specific time.
+- **Recurring Schedule**: Schedule recurring function call at specific interval. You can use this to make AI chat proactively in fixed interval(by using system message to initiate the talk instead of you). E.g. "Now schedule a recurring PC screenshot and push the image to the context every minute".
 - **Information Lookup**: Search for information on the internet.
 - **Navigate Browser**: Use together with information lookup, you can navigate to the search result webpage, e.g. news, youtube page, Wikipeda. 
 - **Summarize Webpage**: Use together with information lookup, you can ask the AI to get the content from static webpage and summarize it.
