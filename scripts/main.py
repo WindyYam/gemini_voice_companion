@@ -177,20 +177,18 @@ if __name__ == "__main__":
         else:
             print("Too many system message call in a row!")
 
-    def vision_mode(on:bool):
+    def vision_mode(on:bool, type:str):
+        if type == 'camera':
+            context['vision_mode_camrea_is_screen'] = False
+        else:
+            context['vision_mode_camrea_is_screen'] = True
+
         if(on):
             if not context['vision_mode_camrea_is_screen']:
                 cam.start()
             context['vision_mode'] = True
         else:
             context['vision_mode'] = False
-            cam.stop()
-
-    def switch_camrea_to_screenshot(on:bool):
-        context['vision_mode_camrea_is_screen'] = on
-        if (not on) and context['vision_mode']:
-            cam.start()
-        else:
             cam.stop()
             
     def camera_shot()->str:
