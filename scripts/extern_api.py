@@ -67,17 +67,20 @@ def bingSearch(query:str)->str:
     search_results = []
 
     for result in soup.find_all('li', class_='b_algo'):
-        anchor = result.find('a')
-        title = anchor.text
-        url = result.find('a')['href']
-        desc = result.find('p') or anchor
-        description= desc.text
-        
-        search_results.append({
-            'title': title,
-            'description': description,
-            'url': url
-        })
+        try:
+            anchor = result.find('a')
+            title = anchor.text
+            url = result.find('a')['href']
+            desc = result.find('p') or anchor
+            description= desc.text
+            
+            search_results.append({
+                'title': title,
+                'description': description,
+                'url': url
+            })
+        except Exception as e:
+            pass
     
     return json.dumps(search_results)
 
@@ -180,5 +183,5 @@ def get_clipboard_text() -> str:
     return s
 
 if __name__ == "__main__":
-    ret = bingSearch('News update')
+    ret = bingSearch(query='News')
     print(ret)

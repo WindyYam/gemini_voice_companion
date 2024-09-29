@@ -46,7 +46,7 @@ from datetime import datetime, date, timedelta
 ##########################################################
 # apart from the above APIs, you also get access to the following python function API:
 ##########################################################
-# Push a message to you. call this when you want to read any variable or photo. The message will target you, not the user. This forces the system to send the value message for you to read. No return value, the value will be in the next request for you from the system.
+# Push a message to you. The message will target you, not the user. If you call this with text, you can send the text to yourself as a system role. If you call this with any variable or photo, you can send the value or photo to yourself. It will be the next request in the conversation.
 system_message(value)
 
 # turning on/off vision mode so it will attach a photo on every request to you as your vision, arg is True/False. When it is set on, be aware that you don't need system_message() for the photo
