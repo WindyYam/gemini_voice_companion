@@ -1,5 +1,5 @@
 """
-modified to do realtime transcribe at the beginning of silence detection for faster transcribe
+modified to do transcribe at the beginning of silence detection for faster transcribe
 """
 from RealtimeSTT import AudioToTextRecorder
 import time
@@ -12,7 +12,6 @@ import itertools
 import copy
 
 INT16_MAX_ABS_VALUE = 32768.0
-TIME_SLEEP = 0.02
 
 class FasterAudioRecorder(AudioToTextRecorder):
     def _recording_worker(self):
@@ -166,6 +165,10 @@ class FasterAudioRecorder(AudioToTextRecorder):
                             if self.speech_end_silence_start == 0:
                                 self.speech_end_silence_start = time.time()
                                 if(len(self.frames) > 0):
+                                    # remove pending
+                                    while self.transcribe_count > 0:
+                                        status, result = self.parent_transcription_pipe.recv()
+                                        self.transcribe_count -= 1
                                     audio_array = np.frombuffer(b''.join(self.frames), dtype=np.int16)
                                     audio = audio_array.astype(np.float32) / INT16_MAX_ABS_VALUE
                                     self.parent_transcription_pipe.send((audio, self.language))
