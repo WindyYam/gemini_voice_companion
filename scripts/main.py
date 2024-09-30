@@ -431,7 +431,7 @@ if __name__ == "__main__":
                 text = input()
                 text = f'**Master:**{text}'
                 if context['vision_mode']:
-                    capture_upload_photo()
+                    start_vision_mode_photo_thread()
                 mInputQueue.put(text)
 
         def voice_thread():
@@ -482,14 +482,13 @@ if __name__ == "__main__":
                             
                             voice_off_sound.play()
 
-                            voice_recognition.stop_listen()
+                            temp_text = voice_recognition.stop_listen()
                             if context['vision_mode']:
                                 if(upload_handle in scheduler.queue):
                                     # the scheduled upload not fired yet, upload it now
                                     scheduler.cancel(upload_handle)
                                     upload_handle = None
                                     start_vision_mode_photo_thread()
-                            temp_text = voice_recognition.transcribe_voice()
                             
                             voice_embed = voice_recognition.generate_embed(voice_recognition.recorder.audio)
                             closest_similirity = 0

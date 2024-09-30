@@ -1,4 +1,4 @@
-from RealtimeSTT import AudioToTextRecorder
+from faster_audio_recorder import FasterAudioRecorder
 from resemblyzer import preprocess_wav, VoiceEncoder
 import numpy as np
 import pyaudio
@@ -25,14 +25,14 @@ class VoiceRecognition:
             'silero_sensitivity': 0.1,
             'silero_use_onnx': True,
             'webrtc_sensitivity': 1,
-            'post_speech_silence_duration': 0.2,
+            'post_speech_silence_duration': 0.3,
             'min_length_of_recording': 0.5,
             'min_gap_between_recordings': 0,
             "compute_type" : "default",
             'input_device_index': device_index,
-            'on_recording_start':on_recording_start
+            'on_recording_start':on_recording_start,
         }
-        self.recorder = AudioToTextRecorder(**self.recorder_config)
+        self.recorder = FasterAudioRecorder(**self.recorder_config)
         self.encoder = VoiceEncoder('cpu')
 
     def generate_embed(self, audio):
@@ -50,6 +50,7 @@ class VoiceRecognition:
         self.recorder.set_microphone(False)
         self.recorder.stop()
         self.recorder.wait_audio()
+        return self.recorder.transcribe()
 
     def transcribe_voice(self) -> str:
         return self.recorder.transcribe()
