@@ -166,7 +166,7 @@ class FasterAudioRecorder(AudioToTextRecorder):
                                 self.speech_end_silence_start = time.time()
                                 if(len(self.frames) > 0):
                                     # remove pending
-                                    while self.transcribe_count > 0:
+                                    while self.parent_transcription_pipe.poll():
                                         status, result = self.parent_transcription_pipe.recv()
                                         self.transcribe_count -= 1
                                     audio_array = np.frombuffer(b''.join(self.frames), dtype=np.int16)
