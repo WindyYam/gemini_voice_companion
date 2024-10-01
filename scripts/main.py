@@ -422,6 +422,7 @@ if __name__ == "__main__":
         upload_handle = None
         text_to_speech = TextToSpeech(SOUNDS_PATH, device_name=config['speaker_device'])
         voice_recognition = VoiceRecognition(on_recording_start=on_record_start, device_name=config['recorder_device'])
+        voice_recognition.recorder.set_fast_transcribe_on_recording_judger(lambda: not text_to_speech.stream.is_playing())
 
         def trigger_button(e):
             evt_enter.set()
@@ -511,6 +512,7 @@ if __name__ == "__main__":
 
                     else:
                         evt_enter.clear()
+                        # only do fast transcribe when text to speech is not playing, so we have more control when to do transcribe(do transcribe and synthesis at the same time can cause low performance)
                         voice_recognition.listen()
                         if context['sleep']:
                             # It is sleeping, we detect if the name appears in the text to exit sleep
@@ -520,8 +522,7 @@ if __name__ == "__main__":
                             if config['ai_name'] in temp_text:
                                 print('Exit sleep')
                                 context['sleep'] = False
-
-                        if not context['sleep']:
+                        else:
                             # in free talk mode, we verify the speaker
                             voice_embed = voice_recognition.generate_embed(voice_recognition.recorder.audio)
 

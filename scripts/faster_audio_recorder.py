@@ -23,6 +23,8 @@ class FasterAudioRecorder(AudioToTextRecorder):
         logging.debug('Starting recording worker')
         if not hasattr(self, "transcribe_count"):
             self.transcribe_count = 0
+        if not hasattr(self, "fast_transcribe_on_recording_judger"):
+            self.fast_transcribe_on_recording_judger = lambda : True
         try:
             was_recording = False
             delay_was_passed = False
@@ -164,7 +166,7 @@ class FasterAudioRecorder(AudioToTextRecorder):
                             # measuring silence time before stopping recording
                             if self.speech_end_silence_start == 0:
                                 self.speech_end_silence_start = time.time()
-                                if(len(self.frames) > 0):
+                                if self.fast_transcribe_on_recording_judger() and (len(self.frames) > 0):
                                     # remove pending
                                     while self.parent_transcription_pipe.poll():
                                         status, result = self.parent_transcription_pipe.recv()
@@ -231,3 +233,7 @@ class FasterAudioRecorder(AudioToTextRecorder):
         else:
             logging.error(result)
             raise Exception(result)
+    
+    #For dynamic judgement of fast transcribe during recording. since I don't want it to transcribe when the AI is speaking at the same time, which can cause performance issue on my PC
+    def set_fast_transcribe_on_recording_judger(self, judger):
+        self.fast_transcribe_on_recording_judger = judger
