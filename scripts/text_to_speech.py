@@ -18,7 +18,7 @@ class TextToSpeech:
         self.eng = RealtimeTTS.CoquiEngine(   
             voice=self.DEFAULT_VOICE,
             specific_model='v2.0.3',
-            stream_chunk_size=30,
+            stream_chunk_size=20,
             speed=1.3,
             pretrained=False,
             comma_silence_duration=0.2,

@@ -11,10 +11,9 @@ class SerializableFile(file_types.File):
 class GeminiAI:
     def __init__(self, system_instruction):
         genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-        #lists = genai.list_files()
-        #for item in lists:
-            #print(item.name)
-            #genai.delete_file(item)
+        # for m in genai.list_models():
+        #     if 'generateContent' in m.supported_generation_methods:
+        #         print(m.name)
         self.model = self._initialize_model(system_instruction)  
 
     def _initialize_model(self, system_instruction):
