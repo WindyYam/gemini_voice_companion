@@ -270,9 +270,13 @@ if __name__ == "__main__":
         scheduler.enter(interval_sec, 1, recurring_wrapper, argument=(interval_sec, cb, arg))
 
     def schedule_recurring(interval_sec, cb, arg=()):
+        if not type(arg) is tuple:
+            arg = (arg,)
         scheduler.enter(interval_sec, 1, recurring_wrapper, argument=(interval_sec, cb, arg))
 
     def schedule(dt:datetime, cb, arg=()):
+        if not type(arg) is tuple:
+            arg = (arg,)
         secs = (dt - datetime.now()).total_seconds()
         scheduler.enter(secs, 1, callback_wrapper, argument=(cb, arg))
 
@@ -648,7 +652,7 @@ if __name__ == "__main__":
                 print(f"AI: {response}")
                 
                 pythoncode = gemini_ai.extract_code(response)
-                voice_text = gemini_ai.strip_code(response)
+                voice_text = gemini_ai.strip_code(response).strip()
                 if voice_text != '':
                     text_to_speech.stop()
                 # Update context
