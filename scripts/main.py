@@ -526,7 +526,7 @@ if __name__ == "__main__":
                             if config['ai_name'] in temp_text:
                                 print('Exit sleep')
                                 context['sleep'] = False
-                        else:
+                        if not context['sleep']:
                             # in free talk mode, we verify the speaker
                             voice_embed = voice_recognition.generate_embed(voice_recognition.recorder.audio)
 
