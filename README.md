@@ -5,6 +5,8 @@ Gemini Voice Companion is a Python-based voice assistant that offers a wide rang
 This app is best for users who crave hands-free convenience.  Seamlessly access information and control your devices with just your voice while your hands are on other activities.
 Or, if you are the one who like to get eyes a bit of rest while still want to explore the internet world, then this will be the perfect choice for you.
 
+Specially, this App mainly aimed and optimized for in car usage and entertainment, which takes the noise and unwanted voice from your car navigation system into consideration. Either access from a laptop in car, or a laptop in house <- discord -> mobile phone in car(either bluetooth to car in call mode, or you mignt want a wired cable audio output & input to your car as bluetooth call mode audio quality is bad).
+
 Currently test on Windows only.
 My Laptop is nVidia RTX A500 with 4GB VRAM. So in `voice_recognition.py` I am using the small model of whisper. If your PC is rich in VRAM don't hesitate to use the `large-v2` one.
 
