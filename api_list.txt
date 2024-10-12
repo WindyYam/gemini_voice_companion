@@ -3,7 +3,8 @@
 # important! To read any value from code execution to the conversation, use system_message(val) on the value, which forces system to relay the information to you.
 
 ##########################################################
-# APIs for controlling
+# You can control the house
+# The following are the APIs for controlling the house appliance
 ##########################################################
 # control light on and off
 light(on:bool)
@@ -17,22 +18,22 @@ setAirConditioner(temp:float)
 # set fan speed, range from 0 to 100
 setFanSpeed(speed:int)
 
-##########################################################
-# APIs for getting information that you don't know
-# At the end, to get the information, you should use system_message(value) on the returned value, which force system to send the value to you
-# When searching for news, remember always try to summarize highlights in median detail of what you have found
-##########################################################
 # check for all house smart appliance status
 getHouseStatus()->str
 
+##########################################################
+# You can get the real world information by web searching and reading
+# The following are the APIs for searching and reading through the web
+##########################################################
 # get the current city name
 getCity()->str
 
-# online search for any information you don't know from bing search engine, e.g. news, weather, which gives you several links and brief descriptions. If you want more details, then you need to pick up the best one link and get the text from there.
-# after search, always summarize the highlights of the result
+# online search for any information you don't know from bing search engine, e.g. news, weather, which gives you several links and brief descriptions. 
+# afther the search, always get more detail by get_webpage_text() call to the most relative link from the search result.
+# after information search, summarize the highlights of the search result and the detail text result you get from the link.
 bingSearch(query:str)->str
 
-# get webpage text
+# get webpage content text
 get_webpage_text(url:str)->str
 
 ##########################################################
@@ -40,13 +41,15 @@ get_webpage_text(url:str)->str
 #########################################################
 # for http request
 import request
+
 # for time and date
 from datetime import datetime, date, timedelta
 
 ##########################################################
-# apart from the above APIs, you also get access to the following python function API:
+# You can interact with the system, such as camera, voice output, music player, memory, keyboard, etc.
+# The following are the APIs to interact with the system
 ##########################################################
-# Push a message to you. The message will target you, not the user. If you call this with text, you can send the text to yourself as a system role. If you call this with any variable or photo, you can send the value or photo to yourself. It will be the next request in the conversation.
+# push a message to you. The message will target you, not the user. If you call this with text, you can send the text to yourself as a system role. If you call this with any variable or photo, you can send the value or photo to yourself. It will be the next request in the conversation.
 system_message(value)
 
 # turning on/off vision mode so it will attach a photo on every request to you as your vision, arg on is True/False, type can be 'camera' or 'screenshot' to indicate image source. When vision mode is set on, you don't need system_message() for the photo
@@ -101,7 +104,7 @@ play_next_music()
 # play the previous music track
 play_prev_music()
 
-# stop current music
+# stop current music track
 stop_music()
 
 # control the user's browser to navigate to a webpage. If it doesn't work, remind the user to try close all Chrome instance.

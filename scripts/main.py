@@ -23,7 +23,6 @@ if __name__ == "__main__":
     SOUNDS_PATH = 'sounds/'
     USER_VOICE_PATH = 'sounds/users'
     TEMP_PATH = 'temp/'
-    PHOTO_NAME = 'camera.jpg'
     CONFIG_FILE = 'config.json'
     HISTORY_FILE = 'history.txt'
     MEMORY_FILE = 'memory.txt'
@@ -155,10 +154,10 @@ if __name__ == "__main__":
         string_output = io.StringIO()
         print(*values, file=string_output, sep=sep, end=end, flush=flush)
         response = string_output.getvalue().strip()
-        if context['vision_mode'] and PHOTO_NAME in response:
+        if context['vision_mode'] and ".jpg" in response:
             print('In photo stream mode, no need to upload capture photo here.')
             return
-        if context['system_message_in_a_row'] < 2 and context['upload_in_a_row'] < 1:
+        if context['system_message_in_a_row'] < 3 and context['upload_in_a_row'] < 1:
             context['system_message_in_a_row'] += 1
             if response.endswith('.jpg'):
                 image_file = string_output.getvalue().strip()
@@ -196,7 +195,8 @@ if __name__ == "__main__":
         cam.start()
         img = cam.get_image()
         shutter_sound.play()
-        photo_path = f"{TEMP_PATH}{PHOTO_NAME}"
+        timestr = time.strftime("%Y%m%d-%H%M%S")
+        photo_path = f"{TEMP_PATH}camera-{timestr}.jpg"
         # saving the image 
         pygame.image.save(img, photo_path)
         return photo_path
@@ -217,7 +217,8 @@ if __name__ == "__main__":
 
             # Resize the image to half resolution
             screenshot = screenshot.resize((new_width, new_height), Image.LANCZOS)
-        filename = "temp/screenshot.jpg"
+        timestr = time.strftime("%Y%m%d-%H%M%S")
+        filename = f"{TEMP_PATH}screenshot-{timestr}.jpg"
 
         # Save the screenshot as JPG
         screenshot.save(filename, "JPEG")
