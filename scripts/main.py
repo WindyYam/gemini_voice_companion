@@ -23,6 +23,8 @@ if __name__ == "__main__":
     SOUNDS_PATH = 'sounds/'
     USER_VOICE_PATH = 'sounds/users'
     TEMP_PATH = 'temp/'
+    CHATLOG_PATH = TEMP_PATH+'chatlog/'
+    IMAGE_PATH = TEMP_PATH+'images/'
     CONFIG_FILE = 'config.json'
     HISTORY_FILE = 'history.txt'
     MEMORY_FILE = 'memory.txt'
@@ -63,6 +65,8 @@ if __name__ == "__main__":
 
     # Create the folder if it doesn't exist
     os.makedirs(TEMP_PATH, exist_ok=True)
+    os.makedirs(CHATLOG_PATH, exist_ok=True)
+    os.makedirs(IMAGE_PATH, exist_ok=True)
 
     if len(sys.argv) >= 2:
         CONFIG_FILE = sys.argv[1]
@@ -123,7 +127,7 @@ if __name__ == "__main__":
     ]
 
     def append2log(text:str):
-        fname = TEMP_PATH + 'chatlog-' + today + '.txt'
+        fname = CHATLOG_PATH + 'chatlog-' + today + '.txt'
         with open(fname, "a", encoding='utf8') as f:
             f.write(text.strip() + "\n")
 
@@ -196,7 +200,7 @@ if __name__ == "__main__":
         img = cam.get_image()
         shutter_sound.play()
         timestr = time.strftime("%Y%m%d-%H%M%S")
-        photo_path = f"{TEMP_PATH}camera-{timestr}.jpg"
+        photo_path = f"{IMAGE_PATH}camera-{timestr}.jpg"
         # saving the image 
         pygame.image.save(img, photo_path)
         return photo_path
@@ -218,7 +222,7 @@ if __name__ == "__main__":
             # Resize the image to half resolution
             screenshot = screenshot.resize((new_width, new_height), Image.LANCZOS)
         timestr = time.strftime("%Y%m%d-%H%M%S")
-        filename = f"{TEMP_PATH}screenshot-{timestr}.jpg"
+        filename = f"{IMAGE_PATH}screenshot-{timestr}.jpg"
 
         # Save the screenshot as JPG
         screenshot.save(filename, "JPEG")
@@ -324,7 +328,7 @@ if __name__ == "__main__":
             context['freetalk'] = on
 
     def get_today_conversation() -> str:
-        fname = TEMP_PATH + 'chatlog-' + today + '.txt'
+        fname = CHATLOG_PATH + 'chatlog-' + today + '.txt'
         return fname
     
     def start_new_conversation(summary:str):
