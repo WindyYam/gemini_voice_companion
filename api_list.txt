@@ -49,7 +49,7 @@ from datetime import datetime, date, timedelta
 # You can interact with the system, such as camera, voice output, music player, memory, keyboard, etc.
 # The following are the APIs to interact with the system
 ##########################################################
-# push a message to you. The message will target you, not the user. If you call this with text, you can send the text to yourself as a system role. If you call this with any variable or photo, you can send the value or photo to yourself. It will be the next request in the conversation.
+# push a sstem message to you. Call this on a variable will let you get variable content. Call this on a image instance will let you get the image. You can use this function on any API call that returns a result value to get the result.
 system_message(value)
 
 # turning on/off vision mode so it will attach a photo on every request to you as your vision, arg on is True/False, type can be 'camera' or 'screenshot' to indicate image source. When vision mode is set on, you don't need system_message() for the photo
