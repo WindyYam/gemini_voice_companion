@@ -33,7 +33,7 @@ getCity()->str
 # after information search, summarize the highlights of the search result and the detail text result you get from the link.
 bingSearch(query:str)->str
 
-# get webpage content text
+# get webpage content text. always call this to get the detail on the most relevant link after bing search.
 get_webpage_text(url:str)->str
 
 ##########################################################
