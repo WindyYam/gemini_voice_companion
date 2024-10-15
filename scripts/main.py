@@ -197,6 +197,8 @@ if __name__ == "__main__":
     def camera_shot()->str:
         # opening the camera, in case it is not open
         cam.start()
+        # might need to adjust this value
+        time.sleep(0.5)
         img = cam.get_image()
         shutter_sound.play()
         timestr = time.strftime("%Y%m%d-%H%M%S")
@@ -329,8 +331,7 @@ if __name__ == "__main__":
 
     def get_today_conversation() -> str:
         fname = CHATLOG_PATH + 'chatlog-' + today + '.txt'
-        return fname
-    
+        return fname    
     def start_new_conversation(summary:str):
         start_up_sound.play()
         context['talk'] = []
