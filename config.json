@@ -3,7 +3,7 @@
   "user_chrome_data_path": "C:\\Users\\Zhenya\\AppData\\Local\\Google\\Chrome\\User Data",
   "max_history": 20,
   "max_memory": 10,
-  "target_camera": "DroidCam Video",
+  "target_camera": "",
   "recorder_device": null,
   "speaker_device": null,
   "voice_similarity_threshold": 0.72,

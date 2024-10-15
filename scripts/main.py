@@ -33,7 +33,7 @@ if __name__ == "__main__":
         'talk': [],
         'upload_file': None,
         'vision_mode': False,
-        'system_message_in_a_row': 0,
+        'system_message_in_a_row': 0,   # This and the following is to prevent system message trigger infinite system message loop. Sometimes the AI will post system_message in a response to system_message and loop it forever.
         'upload_in_a_row': 0,
         'freetalk': True,
         'sleep': False,
@@ -273,6 +273,9 @@ if __name__ == "__main__":
     def recurring_wrapper(interval_sec, cb, arg=()):
         print('Recurring event')
         recurring_sound.play()
+        # Might resulting a request from recurring event, clear some flags
+        context['system_message_in_a_row'] = 0
+        context['upload_in_a_row'] = 0
         cb(*arg)
         scheduler.enter(interval_sec, 1, recurring_wrapper, argument=(interval_sec, cb, arg))
 
@@ -443,6 +446,9 @@ if __name__ == "__main__":
                 text = f'**Master:**{text}'
                 if context['vision_mode']:
                     start_vision_mode_photo_thread()
+                # Request is from keyboard, clear some flags
+                context['system_message_in_a_row'] = 0
+                context['upload_in_a_row'] = 0
                 mInputQueue.put(text)
 
         def voice_thread():
@@ -604,6 +610,9 @@ if __name__ == "__main__":
                                 user_lists.append({'user': 'Master', 'embedding': voice_embed})
                             # sound
                             print('\a')
+                        # Request is from voice, clear some flags
+                        context['system_message_in_a_row'] = 0
+                        context['upload_in_a_row'] = 0
                         mInputQueue.put(text)
                 except Exception as e:
                     print(e)
