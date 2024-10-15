@@ -39,8 +39,8 @@ Answer phone call(remote usage): https://youtu.be/kon9clc4MDQ
 - **News Updates**: Fetch and read out the latest news.
 - **Spotify Integration**: Play and control music on Spotify.
 - **PC Keyboard Control**: Type content onto your PC using voice commands.
-- **Take Picture**: Either take a photo from the camera, or take a screenshot of your PC, which will then get uploaded to gemini. For better experience, recommend to download ```DroidCam https://droidcam.app/``` to turn your mobile phone into a camera.
-- **Vision Mode**: Attach photo on every of your request to the AI to provide vision context, either from the camrea or from screenshot (if you are doing discord video chat with the AI, the screenshot let the AI see the video screenshot from the other end)
+- **Take Picture**: Either take a photo from the camera, or take a screenshot of your PC, which will then get uploaded to gemini. For better experience, recommend to download ```DroidCam https://droidcam.app/``` to turn your mobile phone into a camera. Update: DroidCam has some issue in getting camera frames when it is not in vision mode. Now since discord can do video call that turn your mobile phone into camera, the recommend way of using the mobile phone camera is discord mobile video call -> PC discord preview fullscreen -> ask AI on PC to take screenshot and analyze.
+- **Vision Mode**: Attach photo on every of your request to the AI to provide vision context, either from the camrea or from screenshot (if you are doing discord video chat with the AI, the screenshot mode let the AI see the video screenshot from your mobile phone)
 - **Write Diary Entry**: It can upload the conversation history today and then you can ask the AI to write diary entry based on that. You will have to explicitly ask the AI to access the history for reference(it is recommended to start a new conversation for AI after that as the history file can be huge which slows down the subsequential requests).
 - **Memorize Information**: It can memorize information and save locally, like the user's preference on music, user's family informations. You can explicitly ask it to remember something or write something down. The max number of memory items can be adjusted in `config.json`
 
@@ -69,7 +69,7 @@ After that, simply run `setup.bat` to install all dependencies.
 - **Trigger Mode**: Disable free talk mode by saying "Turn off free talk mode". Then use:
   - Tab key or media play/pause key to start speaking
   - Press the same key again to stop and get a response
-- **Vision Mode**: By normal, you only upload photo if you ask the AI to take a photo. If you ask Gemini to turn this mode on, every single of your request will be attached with a photo from your camera, captured at the very beginning of your voice, to provide a vision-like experience. Use it wisely, as photos take siginificant amount of tokens and time for AI to process. You can ask the AI to switch to screenshot vision mode instead of default camrea vision mode, which works very well with Discord video chat (you are the one to video chat with the AI).
+- **Vision Mode**: By normal, you only upload photo if you ask the AI to take a photo. If you ask Gemini to turn this mode on, every single of your request will be attached with a photo from your camera, captured at the very beginning of your voice with a delay configurable through `config.json`, to provide a vision-like experience. Use it wisely, as photos take siginificant amount of tokens and time for AI to process. You can ask the AI to switch to screenshot vision mode instead of default camrea vision mode, which works very well with Discord fullscreen video chat (you are the one to video chat with the AI).
 - **Sleep Mode**: Tell the companion to go to sleep, it will not react to any voice activity. Only work in Free Talk mode. To wake it up again, use a phrase which contains its name. As usual, longer phrase have better recognition.
 
 ### Activating your voice
