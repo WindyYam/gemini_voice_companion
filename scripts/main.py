@@ -560,6 +560,7 @@ if __name__ == "__main__":
                                             upload_handle = None
                                             start_vision_mode_photo_thread()
                                     temp_text = voice_recognition.transcribe_voice()
+
                                 text = f'**{closest_user}:**{temp_text}'
                                 voice_off_sound.play()
                             else:
