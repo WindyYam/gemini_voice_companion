@@ -353,7 +353,7 @@ if __name__ == "__main__":
 
     def update_memory_str():
         if len(context['memory']) > 0:
-            context['memory_str'] = f"You have memories: {",".join(context['memory'])}"
+            context['memory_str'] = f"You remember these things: {",".join(context['memory'])}"
         else:
             context['memory_str'] = ''
 
@@ -508,16 +508,16 @@ if __name__ == "__main__":
                                     start_vision_mode_photo_thread()
                             
                             voice_embed = voice_recognition.generate_embed(voice_recognition.recorder.audio)
-                            closest_similirity = 0
+                            closest_similarity = 0
                             closest_user = None
                             for item in user_lists:
                                 user_similarity = voice_recognition.verify_speaker(item['embedding'], voice_embed)
                                 print(f"{item['user']} similarity:", user_similarity)
-                                if user_similarity > closest_similirity:
-                                    closest_similirity = user_similarity
+                                if user_similarity > closest_similarity:
+                                    closest_similarity = user_similarity
                                     closest_user = item['user']
 
-                            if closest_similirity > verify_threshold:
+                            if closest_similarity > verify_threshold:
                                 text = f'**{closest_user}:**{temp_text}'
                             else:
                                 text = f'**Guest:**{temp_text}'
@@ -542,16 +542,16 @@ if __name__ == "__main__":
                             # in free talk mode, we verify the speaker
                             voice_embed = voice_recognition.generate_embed(voice_recognition.recorder.audio)
 
-                            closest_similirity = 0
+                            closest_similarity = 0
                             closest_user = None
                             for item in user_lists:
                                 user_similarity = voice_recognition.verify_speaker(item['embedding'], voice_embed)
                                 print(f"{item['user']} similarity:", user_similarity)
-                                if user_similarity > closest_similirity:
-                                    closest_similirity = user_similarity
+                                if user_similarity > closest_similarity:
+                                    closest_similarity = user_similarity
                                     closest_user = item['user']
 
-                            if closest_similirity > verify_threshold:
+                            if (closest_similarity > verify_threshold) and (not text_to_speech.stream.is_playing() or  (text_to_speech.stream.is_playing() and len(voice_recognition.recorder.audio) > voice_recognition.recorder.sample_rate * 3)):    # Only transcribe sentence which is > 3 seconds long when it is talking, ignore small fragments
                                 if not temp_text:
                                     if context['vision_mode']:
                                         if(upload_handle in scheduler.queue):
@@ -569,8 +569,8 @@ if __name__ == "__main__":
                                     # the scheduled upload not fired yet, upload it now
                                     scheduler.cancel(upload_handle)
                                     upload_handle = None
-                                # do the AI_NAME match only when it is not talking, as this consumes GPU resource
-                                if not text_to_speech.stream.is_playing():
+                                # do the AI_NAME match only when it is not talking and record length > 3sec, as this consumes GPU resource
+                                if not text_to_speech.stream.is_playing() and len(voice_recognition.recorder.audio) > voice_recognition.recorder.sample_rate * 3:
                                     if not temp_text:
                                         temp_text = voice_recognition.transcribe_voice()
                                     print(temp_text)

@@ -134,7 +134,7 @@ class FasterAudioRecorder(AudioToTextRecorder):
                             and self.start_recording_on_voice_activity) \
                             or self.wakeword_detected:
 
-                        if self._is_webrtc_speech(data):
+                        if self._is_voice_active():
                             logging.info("voice activity detected")
 
                             self.start()
@@ -149,9 +149,9 @@ class FasterAudioRecorder(AudioToTextRecorder):
 
                             self.silero_vad_model.reset_states()
                         else:
-                            pass
-                            #data_copy = data[:]
-                            #self._check_voice_activity(data_copy)
+                            #pass
+                            data_copy = data[:]
+                            self._check_voice_activity(data_copy)
 
                     self.speech_end_silence_start = 0
 

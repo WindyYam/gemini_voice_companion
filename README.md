@@ -75,7 +75,7 @@ After that, simply run `setup.bat` to install all dependencies.
 ### Activating your voice
 
 - For the main users, the voice is already recognized by the setup voice samples in ## Usage 2.
-- For a guest that is not in the list, the default keyword is "Jarvis"(Or AI_NAME if you modified it), or "Nice/Pleased/Good/Ok/xxx to meet you". Use it in a phrase long enough to generate a voice embedding, so the AI can recognize the voice subsequentially without the keyword.
+- For a guest that is not in the list, the default keyword is "Jarvis"(Or AI_NAME if you modified it), or "Nice/Pleased/Good/Ok/xxx to meet you". Use it in a phrase long enough to generate a voice embedding(at least > 3 sec), so the AI can recognize the voice subsequentially without the keyword.
 - For guest, once activated, the companion will recognize the current user until another guest replace it.
 - All guests that are not main users, Gemini will not react to the house commands from them. But will still help with other commands.
 - Keep in mind, if you change the recorder device (like from a microphone to a VoIP output), the system might have problem recognize your voice, so you might need to record in ## Usage 2 again with new recorder device(as a new user with different voice sample).
