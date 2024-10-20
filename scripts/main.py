@@ -530,6 +530,7 @@ if __name__ == "__main__":
                         evt_enter.clear()
                         # only do fast transcribe when text to speech is not playing, so we have more control when to do transcribe(do transcribe and synthesis at the same time can cause low performance)
                         voice_recognition.listen()
+                        print(len(voice_recognition.recorder.audio)/voice_recognition.recorder.sample_rate, 'sec')
                         if context['sleep']:
                             # It is sleeping, we detect if the name appears in the text to exit sleep
                             if not temp_text:
