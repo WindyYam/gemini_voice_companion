@@ -661,7 +661,7 @@ if __name__ == "__main__":
 
                 # Process user's request
                 try:
-                    response = gemini_ai.generate_response(temp)
+                    response = gemini_ai.generate_response(temp).strip()
                 except Exception as e:
                     print(e)
                     text_to_speech.speak("Well, looks like I can't get a response from the server.")
