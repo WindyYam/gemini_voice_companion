@@ -92,7 +92,8 @@ if __name__ == "__main__":
             'recorder_device': RECORDER_DEVICE,
             'speaker_device': SPEAKER_DEVICE,
             'voice_similarity_threshold': 0.72,
-            'vision_mode_capture_delay' : 1
+            'vision_mode_capture_delay' : 1,
+            'allow_record_during_speaking' : True
         }
         try:
             with open(CONFIG_FILE, 'r') as f:
@@ -528,9 +529,12 @@ if __name__ == "__main__":
 
                     else:
                         evt_enter.clear()
-                        # only do fast transcribe when text to speech is not playing, so we have more control when to do transcribe(do transcribe and synthesis at the same time can cause low performance)
+                        if not config['allow_record_during_speaking'] and text_to_speech.stream.is_playing():
+                            time.sleep(0.05)
                         voice_recognition.listen()
                         print(len(voice_recognition.recorder.audio)/voice_recognition.recorder.sample_rate, 'sec')
+                        if not config['allow_record_during_speaking'] and text_to_speech.stream.is_playing():
+                            continue
                         if context['sleep']:
                             # It is sleeping, we detect if the name appears in the text to exit sleep
                             if not temp_text:

@@ -93,6 +93,7 @@ After that, simply run `setup.bat` to install all dependencies.
 - Normally, longer phrase can be easier for the voice recognition.
 - The voice break to consider as a speech is short, so try to avoid long break in one speech. If you do want to extend it, try connect with voice like "eh.." instead of blank.
 - If you find the voice recognition fails too many times, consider re-record your voice sample or lower the 'voice_similarity_threshold' field in `config.json`
+- If you use it in a external speaker & mic, and your audio adapter doesn't have good echo cancellation (You notice it constantly recognize itself's voice through its own voice, due to your voice sample similar to AI's), turn off the flag `allow_record_during_speaking` in the config.json file so it only record when it finishes talking.
 - To remove a user voice sample, simply delete file in sounds/users
 - The AI companion has some memory bank for you to craft with. You can access it in temp/memory.txt. You can add items like "Zhenya's favourite artist is xxx", "The guest user's real name is Tony Stark", "Zhenya wants to hear laughs at the beginning of every reply.". The other way is to use voice command to ask the AI to add memory item.
 
