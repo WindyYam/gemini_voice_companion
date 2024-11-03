@@ -59,7 +59,9 @@ if __name__ == "__main__":
     voice_off_sound.set_volume(0.5)
     start_up_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}startup.mp3")
     shutter_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}shutter.mp3")
+    shutter_sound.set_volume(0.5)
     recurring_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}recurring.mp3")
+    power_off_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}poweroff.mp3")
     today = str(date.today())
     evt_enter = threading.Event()
 
@@ -345,6 +347,7 @@ if __name__ == "__main__":
     
     def go_sleep():
         print('Enter sleep')
+        power_off_sound.play()
         context['sleep'] = True
 
     def save_memory():
@@ -436,7 +439,9 @@ if __name__ == "__main__":
         upload_handle = None
         text_to_speech = TextToSpeech(SOUNDS_PATH, device_name=config['speaker_device'])
         voice_recognition = VoiceRecognition(on_recording_start=on_record_start, device_name=config['recorder_device'])
-        voice_recognition.recorder.set_fast_transcribe_on_recording_judger(lambda: not text_to_speech.stream.is_playing())
+        voice_recognition.recorder.set_recording_judger(lambda: not text_to_speech.stream.is_playing())
+        if not config['allow_record_during_speaking']:
+            voice_recognition.recorder.set_use_record_judger_for_recording(True)
 
         def trigger_button(e):
             evt_enter.set()
@@ -529,12 +534,8 @@ if __name__ == "__main__":
 
                     else:
                         evt_enter.clear()
-                        if not config['allow_record_during_speaking'] and text_to_speech.stream.is_playing():
-                            time.sleep(0.05)
                         voice_recognition.listen()
                         print(len(voice_recognition.recorder.audio)/voice_recognition.recorder.sample_rate, 'sec')
-                        if not config['allow_record_during_speaking'] and text_to_speech.stream.is_playing():
-                            continue
                         if context['sleep']:
                             # It is sleeping, we detect if the name appears in the text to exit sleep
                             if not temp_text:

@@ -23,8 +23,10 @@ class FasterAudioRecorder(AudioToTextRecorder):
         logging.debug('Starting recording worker')
         if not hasattr(self, "transcribe_count"):
             self.transcribe_count = 0
-        if not hasattr(self, "fast_transcribe_on_recording_judger"):
-            self.fast_transcribe_on_recording_judger = lambda : True
+        if not hasattr(self, "recording_judger"):
+            self.recording_judger = lambda : True
+        if not hasattr(self, "use_record_judger_for_recording"):
+            self.use_record_judger_for_recording = False
         try:
             was_recording = False
             delay_was_passed = False
@@ -57,7 +59,9 @@ class FasterAudioRecorder(AudioToTextRecorder):
                     print("BrokenPipeError _recording_worker")
                     self.is_running = False
                     break
-
+                if self.use_record_judger_for_recording and not self.recording_judger():
+                    # if we want to skip the frame when it is speaking
+                    data=bytes(len(data))
                 if not self.is_recording:
                     # Handle not recording state
                     time_since_listen_start = (time.time() - self.listen_start
@@ -166,7 +170,7 @@ class FasterAudioRecorder(AudioToTextRecorder):
                             # measuring silence time before stopping recording
                             if self.speech_end_silence_start == 0:
                                 self.speech_end_silence_start = time.time()
-                                if self.fast_transcribe_on_recording_judger() and (len(self.frames) > 0):
+                                if self.recording_judger() and (len(self.frames) > 0):
                                     # remove pending
                                     while self.parent_transcription_pipe.poll():
                                         status, result = self.parent_transcription_pipe.recv()
@@ -235,5 +239,8 @@ class FasterAudioRecorder(AudioToTextRecorder):
             raise Exception(result)
     
     #For dynamic judgement of fast transcribe during recording. since I don't want it to transcribe when the AI is speaking at the same time, which can cause performance issue on my PC
-    def set_fast_transcribe_on_recording_judger(self, judger):
-        self.fast_transcribe_on_recording_judger = judger
+    def set_recording_judger(self, judger):
+        self.recording_judger = judger
+
+    def set_use_record_judger_for_recording(self, on):
+        self.use_record_judger_for_recording = on
