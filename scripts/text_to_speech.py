@@ -2,9 +2,9 @@ import RealtimeTTS
 import os
 import wave
 import pygame
-import langdetect
 import numpy as np
 import pyaudio
+from auto_lang_coqui_engine import AutoLangCoquiEngine
 class TextToSpeech:
     def __init__(self, voice_path, device_name = None):
         self.DEFAULT_VOICE = 'default'
@@ -15,7 +15,7 @@ class TextToSpeech:
         self.ROBOT_VOICE = 'robot'
         self.FEMALE_VOICE = 'female'
         self.voice_path = voice_path
-        self.eng = RealtimeTTS.CoquiEngine(   
+        self.eng = AutoLangCoquiEngine(   
             voice=self.DEFAULT_VOICE,
             specific_model='v2.0.3',
             stream_chunk_size=20,
@@ -49,14 +49,8 @@ class TextToSpeech:
     def stop(self):
         self.stream.stop()
 
-    def speak(self, text):
+    def speak(self, text:str):
         text = text.replace('*', ' ')
-        lang = langdetect.detect(text)
-        if('en' in lang):
-            lang = 'en'
-        else:
-            lang = 'zh-cn'
-        self.eng.language = lang
         self.stream.feed(text)
         self.stream.play_async(sentence_fragment_delimiters = ".?!;,\n…{[())]}。-？，")
 

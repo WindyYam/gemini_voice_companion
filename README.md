@@ -27,6 +27,7 @@ Answer phone call(remote usage): https://youtu.be/kon9clc4MDQ
 
 ## Features
 
+- **Multi-Language**: For now the supported language is English and Chinese only. Support them to be in a mixed manner.
 - **Multi-User Recognition**: Distinguish between different users based on voice samples, the extra benefit of this is it will filter out ambient voice or voice like noise.
 - **Voice Switching**: Change the companion's voice on command (e.g., mimic user's voice, switch to Darth Vader's voice. See `api_list.txt` for more.).
 - **House Managing**: Smart house like operation through voice command. It is simulated by pygame as a simple GUI. You can open door, turn on light, etc.
