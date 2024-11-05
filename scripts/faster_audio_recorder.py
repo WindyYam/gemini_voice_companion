@@ -138,7 +138,7 @@ class FasterAudioRecorder(AudioToTextRecorder):
                             and self.start_recording_on_voice_activity) \
                             or self.wakeword_detected:
 
-                        if self._is_voice_active():
+                        if self._is_silero_speech(data[:]):
                             logging.info("voice activity detected")
 
                             self.start()
@@ -150,12 +150,10 @@ class FasterAudioRecorder(AudioToTextRecorder):
                                 # to the recording frames
                                 self.frames.extend(list(self.audio_buffer))
                                 self.audio_buffer.clear()
-
-                            self.silero_vad_model.reset_states()
                         else:
-                            #pass
-                            data_copy = data[:]
-                            self._check_voice_activity(data_copy)
+                            pass
+                            #data_copy = data[:]
+                            #self._check_voice_activity(data_copy)
 
                     self.speech_end_silence_start = 0
 
@@ -165,7 +163,7 @@ class FasterAudioRecorder(AudioToTextRecorder):
                     # Stop the recording if silence is detected after speech
                     if self.stop_recording_on_voice_deactivity:
 
-                        if not self._is_webrtc_speech(data, True):
+                        if not self._is_silero_speech(data[:]):
                             # Voice deactivity was detected, so we start
                             # measuring silence time before stopping recording
                             if self.speech_end_silence_start == 0:

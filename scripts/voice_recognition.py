@@ -22,10 +22,10 @@ class VoiceRecognition:
             'spinner': False,
             'model': 'small',
             'language': '',
-            'silero_sensitivity': 0.1,
+            'silero_sensitivity': 0.2,
             'silero_use_onnx': True,
             'webrtc_sensitivity': 1,
-            'post_speech_silence_duration': 0.3,
+            'post_speech_silence_duration': 0.4,
             'min_length_of_recording': 0.5,
             'min_gap_between_recordings': 0,
             "compute_type" : "default",
@@ -43,11 +43,9 @@ class VoiceRecognition:
         return similarity
 
     def start_listen(self):
-        self.recorder.set_microphone(True)
         self.recorder.start()
 
     def stop_listen(self) -> str:
-        self.recorder.set_microphone(False)
         self.recorder.stop()
         self.recorder.wait_audio()
         return self.recorder.transcribe()
@@ -56,6 +54,4 @@ class VoiceRecognition:
         return self.recorder.transcribe()
 
     def listen(self):
-        self.recorder.set_microphone(True)
         self.recorder.wait_audio()
-        self.recorder.set_microphone(False)
