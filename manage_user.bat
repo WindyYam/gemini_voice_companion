@@ -35,7 +35,7 @@ goto menu
 :delete_user
 echo.
 set /p username=Enter the name of the user to delete: 
-if exist "sounds\users\%username%.wav" (
+if exist sounds\users\%username%.wav (
     del "sounds\users\%username%.wav"
     echo User %username% has been deleted.
 ) else (
