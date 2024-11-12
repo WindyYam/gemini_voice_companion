@@ -11,14 +11,19 @@ class SerializableFile(file_types.File):
 class GeminiAI:
     def __init__(self, system_instruction):
         genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-        # for m in genai.list_models():
-        #     if 'generateContent' in m.supported_generation_methods:
-        #         print(m.name)
-        self.model = self._initialize_model(system_instruction)  
+        print("Available models:")
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                print(m.name)
+        self.model = self._initialize_model(system_instruction)
+        print("Previous uploaded files:")
+        lists = genai.list_files()
+        for item in lists:
+            print(item.name, item.mime_type, item.display_name)
 
     def _initialize_model(self, system_instruction):
         return genai.GenerativeModel(
-            model_name='gemini-1.5-flash-latest',
+            model_name='gemini-1.5-flash',
             safety_settings={
                 HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
                 HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
@@ -60,7 +65,7 @@ class GeminiAI:
     def clear_files(self):
         lists = genai.list_files()
         for item in lists:
-            print(item.name)
+            print(item.name, item.mime_type, item.display_name)
             genai.delete_file(item)
 
     def delete_file(self, file : file_types.File):

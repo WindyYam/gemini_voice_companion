@@ -638,8 +638,8 @@ if __name__ == "__main__":
         while True:
             try:
                 # only fetch the latest text msg
-                if not mInputQueue.empty():
-                    while(not mInputQueue.empty()):
+                if mInputQueue.qsize() > 0:
+                    while(not (mInputQueue.qsize() == 0)):
                         text = mInputQueue.get()
                 else:
                     text = mInputQueue.get()

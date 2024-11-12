@@ -22,7 +22,7 @@ class VoiceRecognition:
             'spinner': False,
             'model': 'small',
             'language': '',
-            'silero_sensitivity': 0.2,
+            'silero_sensitivity': 0.3,
             'silero_use_onnx': True,
             'webrtc_sensitivity': 1,
             'post_speech_silence_duration': 0.4,
