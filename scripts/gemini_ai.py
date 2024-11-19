@@ -11,15 +11,19 @@ class SerializableFile(file_types.File):
 class GeminiAI:
     def __init__(self, system_instruction):
         genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-        print("Available models:")
-        for m in genai.list_models():
-            if 'generateContent' in m.supported_generation_methods:
-                print(m.name)
         self.model = self._initialize_model(system_instruction)
-        print("Previous uploaded files:")
-        lists = genai.list_files()
-        for item in lists:
-            print(item.name, item.mime_type, item.display_name)
+        try:
+            print("Available models:")
+            for m in genai.list_models():
+                if 'generateContent' in m.supported_generation_methods:
+                    print(m.name)
+            print("Previous uploaded files:")
+            lists = genai.list_files()
+            for item in lists:
+                print(item.name, item.mime_type, item.display_name)
+        except Exception as e:
+            pass
+    
 
     def _initialize_model(self, system_instruction):
         return genai.GenerativeModel(
