@@ -1,5 +1,6 @@
 {
   "ai_name": "Jarvis",
+  "model_name": "gemini-1.5-flash",
   "user_chrome_data_path": "C:\\Users\\Zhenya\\AppData\\Local\\Google\\Chrome\\User Data",
   "max_history": 20,
   "max_memory": 10,

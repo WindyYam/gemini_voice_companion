@@ -9,9 +9,8 @@ class SerializableFile(file_types.File):
     def to_json(self):
         return f'+{self.name}+'
 class GeminiAI:
-    def __init__(self, system_instruction):
+    def __init__(self, model_name, system_instruction):
         genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-        self.model = self._initialize_model(system_instruction)
         try:
             print("Available models:")
             for m in genai.list_models():
@@ -23,11 +22,13 @@ class GeminiAI:
                 print(item.name, item.mime_type, item.display_name)
         except Exception as e:
             pass
-    
+        
+        self.model = self._initialize_model(model_name, system_instruction)
 
-    def _initialize_model(self, system_instruction):
+    def _initialize_model(self, model_name, system_instruction):
+        print('Loading model', model_name)
         return genai.GenerativeModel(
-            model_name='gemini-1.5-flash',
+            model_name=model_name,
             safety_settings={
                 HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
                 HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,

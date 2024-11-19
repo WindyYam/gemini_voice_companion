@@ -87,6 +87,7 @@ if __name__ == "__main__":
 
         default_config = {
             'ai_name': AI_NAME,
+            'model_name': 'gemini-1.5-flash',
             'user_chrome_data_path': USER_CHROME_DATA_PATH,
             'max_history' : MAX_HISTORY,
             'max_memory' : MAX_MEMORY,
@@ -412,7 +413,7 @@ if __name__ == "__main__":
             {'role': 'model', 'parts': ['''Alright, I'm ready to execute some Python code! Starting a fresh new talk!\n```python\nstart_new_conversation("""We had some fun talks over various topics.""")\n```''']}
         ]
 
-        gemini_ai = GeminiAI(system_instruction=instruction)
+        gemini_ai = GeminiAI(model_name=config['model_name'], system_instruction=instruction)
 
         def check_function_file():
             try:
