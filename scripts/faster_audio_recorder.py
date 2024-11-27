@@ -10,9 +10,11 @@ import struct
 import collections
 import itertools
 import copy
+import torch
+import signal
 
 INT16_MAX_ABS_VALUE = 32768.0
-
+SAMPLE_RATE = 16000
 class FasterAudioRecorder(AudioToTextRecorder):
     def _recording_worker(self):
         """
@@ -27,6 +29,8 @@ class FasterAudioRecorder(AudioToTextRecorder):
             self.recording_judger = lambda : True
         if not hasattr(self, "use_record_judger_for_recording"):
             self.use_record_judger_for_recording = False
+        if not hasattr(self, "silero_off_sensitivity"):
+            self.silero_off_sensitivity = self.silero_sensitivity
         try:
             was_recording = False
             delay_was_passed = False
@@ -163,7 +167,7 @@ class FasterAudioRecorder(AudioToTextRecorder):
                     # Stop the recording if silence is detected after speech
                     if self.stop_recording_on_voice_deactivity:
 
-                        if not self._is_silero_speech(data[:]):
+                        if self._is_not_silero_speech(data[:]):
                             # Voice deactivity was detected, so we start
                             # measuring silence time before stopping recording
                             if self.speech_end_silence_start == 0:
@@ -235,6 +239,26 @@ class FasterAudioRecorder(AudioToTextRecorder):
         else:
             logging.error(result)
             raise Exception(result)
+        
+    def _is_not_silero_speech(self, chunk):
+        """
+        This is similiar to is_silero_speech but use a different threshold
+        """
+        if self.sample_rate != 16000:
+            pcm_data = np.frombuffer(chunk, dtype=np.int16)
+            data_16000 = signal.resample_poly(
+                pcm_data, 16000, self.sample_rate)
+            chunk = data_16000.astype(np.int16).tobytes()
+
+        self.silero_working = True
+        audio_chunk = np.frombuffer(chunk, dtype=np.int16)
+        audio_chunk = audio_chunk.astype(np.float32) / INT16_MAX_ABS_VALUE
+        vad_prob = self.silero_vad_model(
+            torch.from_numpy(audio_chunk),
+            SAMPLE_RATE).item()
+        is_not_silero_speech_active = vad_prob < (1 - self.silero_off_sensitivity)
+        self.silero_working = False
+        return is_not_silero_speech_active
     
     #For dynamic judgement of fast transcribe during recording. since I don't want it to transcribe when the AI is speaking at the same time, which can cause performance issue on my PC
     def set_recording_judger(self, judger):
@@ -242,3 +266,6 @@ class FasterAudioRecorder(AudioToTextRecorder):
 
     def set_use_record_judger_for_recording(self, on):
         self.use_record_judger_for_recording = on
+
+    def set_silero_off_sensitivity(self, off_sens):
+        self.silero_off_sensitivity = off_sens

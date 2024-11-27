@@ -33,6 +33,7 @@ class VoiceRecognition:
             'on_recording_start':on_recording_start,
         }
         self.recorder = FasterAudioRecorder(**self.recorder_config)
+        self.recorder.set_silero_off_sensitivity(0.4)
         self.encoder = VoiceEncoder('cpu')
 
     def generate_embed(self, audio):
