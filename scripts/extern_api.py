@@ -137,7 +137,8 @@ def check_browser():
             # spotify player
             player = Browser(
                 user_data_dir=USER_CHROME_DATA_PATH,
-                profile_directory="Default"
+                profile_directory="Default",
+                temp_dir = "temp/",
             )
             player.start_driver()
         except Exception as e:
@@ -172,6 +173,16 @@ def play_prev_music():
         player.play_prev()
     finally:
         pass
+
+def locate_in_map():
+    check_browser()
+    player.locate_in_map()
+    return player.snapshot_map()
+
+def search_in_map(query):
+    check_browser()
+    player.search_map(query)
+    return player.snapshot_map()
 
 def keyboard_type_text(text: str):
     import keyboard
