@@ -28,8 +28,8 @@ getHouseStatus()->str
 # get the current city name
 getCity()->str
 
-# online search for any information you don't know from bing search engine, e.g. news, weather, which gives you several links and brief descriptions. 
-# afther the search, always get more detail by get_webpage_text() call to the most relative link from the search result.
+# online search for any information you don't know from bing search engine, e.g. news, weather, which gives you several links and brief descriptions. You can print the result to you using system_message(result)
+# afther reading the result, always get more detail by get_webpage_text() call to the most relative link from the search result.
 # after information search, summarize the highlights of the search result and the detail text result you get from the link.
 bingSearch(query:str)->str
 
@@ -49,14 +49,15 @@ from datetime import datetime, date, timedelta
 # You can interact with the system, such as camera, voice output, music player, memory, keyboard, etc.
 # The following are the APIs to interact with the system
 ##########################################################
-# push a sstem message to you. Call this on a variable will let you get variable content. Call this on a image instance will let you get the image. You can use this function on any API call that returns a result value to get the result.
+# Call the system to send a message to you through conversation. Call this on a variable will let you get variable content. Call this on an image filename will let you get the image. You can use this function on any API call that returns a result value to get the result.
+# You can use the function to access any information of the code. Just like print(msg) will print to the user, system_message(msg) will print to you.
 # be aware: can only be used once per snippet. If you want to get multiple values, try combine them as a single string
 system_message(value)
 
 # turning on/off vision mode so it will attach a photo on every request to you as your vision, arg on is True/False, type can be 'camera' or 'screenshot' to indicate image source. When vision mode is set on, you don't need system_message() for the photo
 vision_mode(on, type)
 
-# take a photo through the camera. this return the photo instance. To read that photo file, put system_message(photo_instance) in the code snippet to force an upload of that photo to you for analysis.
+# take a photo through the camera. this return the photo filename. To read that photo file, put system_message(photo_filename) in the code snippet to force an upload of that photo to you for analysis.
 camera_shot() -> str
 
 # switch voice system to user voice to mimic the user's voice tone only, and your personality keeps unchanged.
@@ -123,7 +124,7 @@ freetalk_mode(on:bool)
 # call this to summarize our talk history, and start a new conversation with the summary. you should generate the detailed summary of all our talk history as argument, and always use raw triple quotes """ for the text.
 start_new_conversation(summary:str)
 
-# take the screenshot of the PC you are running on, return the image file. Call the image with system_message() to get it
+# take the screenshot of the PC you are running on, return the image filename. Call the image with system_message() to get it through conversation
 screenshot() -> str
 
 # type in the text using keyboard API into the PC. Always use raw triple quotes """ for the text.
