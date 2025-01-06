@@ -4,7 +4,8 @@ from google.generativeai.types import HarmCategory, HarmBlockThreshold
 from datetime import datetime
 from google.generativeai.types import file_types
 from google.generativeai.types import RequestOptions
-
+from google.generativeai import protos
+import time
 class SerializableFile(file_types.File):
     def to_json(self):
         return f'+{self.name}+'
@@ -67,6 +68,12 @@ class GeminiAI:
     def get_file(self, name):
         return SerializableFile(genai.get_file(name))
     
+    def wait_file(self, fileD):
+        while fileD.state.name == "PROCESSING":
+            print('.', end='')
+            time.sleep(0.5)
+            fileD = genai.get_file(fileD.name)
+
     def clear_files(self):
         lists = genai.list_files()
         for item in lists:

@@ -16,6 +16,10 @@ if __name__ == "__main__":
     import keyboard
     from pathlib import Path
     import sys
+    from PIL import ImageGrab, Image
+    import cv2
+    import numpy as np
+    from queue import Queue
 
     print("Usage: Modify the config.json on parameters, and run: python main.py")
     print("Usage: To use a different config.json, run: python main.py your_config.json")
@@ -57,6 +61,7 @@ if __name__ == "__main__":
     voice_on_sound.set_volume(0.5)
     voice_off_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}confirm.mp3")
     voice_off_sound.set_volume(0.5)
+    recording_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}recording.mp3")
     start_up_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}startup.mp3")
     shutter_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}shutter.mp3")
     shutter_sound.set_volume(0.5)
@@ -95,7 +100,6 @@ if __name__ == "__main__":
             'recorder_device': RECORDER_DEVICE,
             'speaker_device': SPEAKER_DEVICE,
             'voice_similarity_threshold': 0.72,
-            'vision_mode_capture_delay' : 1,
             'allow_record_during_speaking' : True
         }
         try:
@@ -116,6 +120,140 @@ if __name__ == "__main__":
 
     check_config()
     set_browser_data_path(config['user_chrome_data_path'])
+
+    class UnifiedRecorder:
+        def __init__(self, camera:pygame.camera.Camera):
+            """
+            Initialize unified recorder for both screen and camera recording
+            
+            Args:
+                camera_resolution (tuple): Resolution for camera recording
+                camera_index (int): Camera device index (usually 0 for built-in webcam)
+            """
+            self.is_recording = False
+            self.frame_queue = Queue()
+            self.recording_thread = None
+            self.recording_type = None
+            self.camera = camera
+            
+        def capture_screen_frames(self):
+            """Background thread function to capture screen frames"""
+            while self.is_recording:
+                frame = ImageGrab.grab()
+                frame = np.array(frame)
+                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                self.frame_queue.put(frame)
+                time.sleep(1/24)  # ~30 FPS
+                
+        def capture_camera_frames(self):
+            """Background thread function to capture camera frames"""
+            #self.camera.start()
+            while self.is_recording:
+                frame = self.camera.get_image()
+                frame_buffer = pygame.surfarray.array3d(frame)
+                frame_buffer = frame_buffer.transpose([1, 0, 2])
+                frame_array = np.array(frame_buffer)
+                frame_array = cv2.cvtColor(frame_array, cv2.COLOR_RGB2BGR)
+                self.frame_queue.put(frame_array)
+                time.sleep(1/24)  # ~30 FPS
+            #self.camera.stop()
+
+        def start_recording(self, record_type='screen'):
+            """
+            Start recording
+            
+            Args:
+                record_type (str): Type of recording ('screen' or 'camera')
+            
+            Returns:
+                bool: True if recording started successfully
+            """
+            if self.is_recording:
+                print("Recording is already in progress")
+                return False
+                
+            if record_type not in ['screen', 'camera']:
+                print("Invalid record type. Use 'screen' or 'camera'")
+                return False
+                
+            if record_type == 'camera' and self.camera is None:
+                print("Camera is not available")
+                return False
+            
+            self.is_recording = True
+            self.recording_type = record_type
+            
+            if record_type == 'screen':
+                self.recording_thread = threading.Thread(target=self.capture_screen_frames)
+            else:
+                self.recording_thread = threading.Thread(target=self.capture_camera_frames)
+                
+            self.recording_thread.start()
+            print(f"Started {record_type} recording...")
+            return True
+
+        def stop_recording(self, output_filename, resize_width=640):
+            """
+            Stop recording and save the video
+            
+            Args:
+                output_filename (str): Name for the output file (should end with .mp4)
+                resize_width (int): Resize the frame
+            
+            Returns:
+                str: Path to the saved video file
+            """
+            if not self.is_recording:
+                print("No recording in progress")
+                return None
+
+            # Stop the recording thread
+            self.is_recording = False
+            self.recording_thread.join()
+
+            # Get initial frame to determine dimensions
+            if self.frame_queue.empty():
+                print("No frames captured")
+                return None
+            
+            if(output_filename):
+                first_frame = self.frame_queue.queue[0]
+                height, width = first_frame.shape[:2]
+                new_width = int(resize_width)
+                new_height = int(resize_width / width * height)
+
+                # Initialize video writer
+                fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+                out = cv2.VideoWriter(
+                    output_filename,
+                    fourcc,
+                    24.0,  # FPS
+                    (new_width, new_height),
+                    True
+                )
+
+                print("Processing and saving video...")
+                
+                frame_count = 0
+                while not self.frame_queue.empty():
+                    frame = self.frame_queue.get()
+                    
+                    # Apply basic compression
+                    frame = cv2.GaussianBlur(frame, (3, 3), 0)
+
+                    # Resize frame
+                    frame = cv2.resize(frame, (new_width, new_height), 
+                                    interpolation=cv2.INTER_AREA)
+                    
+                    frame = np.uint8(frame)
+                    
+                    out.write(frame)
+                    frame_count += 1
+
+                out.release()
+                print(f"Video saved to: {output_filename} ({frame_count} frames)")
+            self.frame_queue.queue.clear()
+            return output_filename
 
     instruction = [
         f'''Remember, your name is {config['ai_name']}.
@@ -213,8 +351,6 @@ if __name__ == "__main__":
         return photo_path
     
     def screenshot() -> str:
-        from PIL import ImageGrab, Image
-
         # Capture the screenshot
         screenshot = ImageGrab.grab()
         shutter_sound.play()
@@ -260,7 +396,7 @@ if __name__ == "__main__":
             print(err_msg)
             system_message(err_msg)
 
-    def event_thread(cam: pygame.camera.Camera):
+    def event_thread():
         clock = pygame.time.Clock()
 
         while True:
@@ -406,8 +542,10 @@ if __name__ == "__main__":
             else:
                 cam = pygame.camera.Camera(camlist[0], img_size)
 
+        recorder = UnifiedRecorder(cam)
+
         # Start event thread
-        threading.Thread(target=event_thread, args=(cam, )).start()
+        threading.Thread(target=event_thread).start()
 
         talk_header = [
             {'role': 'user', 'parts': [None, 'This is the list of python APIs you can execute. To execute them, put them in python code snippet at the end of your response. Now start a new conversation.', '']},
@@ -425,20 +563,16 @@ if __name__ == "__main__":
                 print(e)
                 text_to_speech.speak('Hmm, looks like some connection issues out there.')
 
-        def start_vision_mode_photo_thread():
-            global photo_upload_thread
-            photo_upload_thread = threading.Thread(target=capture_upload_photo)
-            photo_upload_thread.start()
-
         def on_record_start():
-            global upload_handle
             if not context['freetalk']:
                 text_to_speech.stop()
             if context['vision_mode']:
-                upload_handle = scheduler.enter(config['vision_mode_capture_delay'], 1, start_vision_mode_photo_thread)
+                recording_sound.play()
+                if context['vision_mode_camrea_is_screen']:
+                    recorder.start_recording('screen')
+                else:
+                    recorder.start_recording('camera')
 
-        photo_upload_thread = None
-        upload_handle = None
         text_to_speech = TextToSpeech(SOUNDS_PATH, device_name=config['speaker_device'])
         voice_recognition = VoiceRecognition(on_recording_start=on_record_start, device_name=config['recorder_device'])
         voice_recognition.recorder.set_recording_judger(lambda: not text_to_speech.stream.is_playing())
@@ -453,14 +587,23 @@ if __name__ == "__main__":
                 text = input()
                 text = f'**Master:**{text}'
                 if context['vision_mode']:
-                    start_vision_mode_photo_thread()
+                    recording_sound.play()
+                    if context['vision_mode_camrea_is_screen']:
+                        recorder.start_recording('screen')
+                    else:
+                        recorder.start_recording('camera')
+                    time.sleep(5)
+                    file_name = TEMP_PATH+'video.mp4'
+                    recorder.stop_recording(file_name)
+                    context['upload_file'] = gemini_ai.upload_file(path=file_name,
+                        display_name="Video")
+
                 # Request is from keyboard, clear some flags
                 context['system_message_in_a_row'] = 0
                 context['upload_in_a_row'] = 0
                 mInputQueue.put(text)
 
         def voice_thread():
-            global upload_handle
             new_speaker_recorded = False
             verify_threshold = config['voice_similarity_threshold']
             
@@ -491,7 +634,7 @@ if __name__ == "__main__":
                         # -179 is the play/pause media key
                         keyboard.on_press_key(-179, trigger_button, suppress=True)
                         keyboard.on_press_key('tab', trigger_button, suppress=True)
-                        
+
                         evt_enter.clear()
                         evt_enter.wait()
                         evt_enter.clear()
@@ -501,20 +644,14 @@ if __name__ == "__main__":
                         if not context['freetalk']:
                             voice_on_sound.play()
                             voice_recognition.start_listen()
-                            
+
                             evt_enter.wait()
                             evt_enter.clear()
                             
                             voice_off_sound.play()
 
                             temp_text = voice_recognition.stop_listen()
-                            if context['vision_mode']:
-                                if(upload_handle in scheduler.queue):
-                                    # the scheduled upload not fired yet, upload it now
-                                    scheduler.cancel(upload_handle)
-                                    upload_handle = None
-                                    start_vision_mode_photo_thread()
-                            
+
                             voice_embed = voice_recognition.generate_embed(voice_recognition.recorder.audio)
                             closest_similarity = 0
                             closest_user = None
@@ -530,6 +667,12 @@ if __name__ == "__main__":
                             else:
                                 text = f'**Guest:**{temp_text}'
 
+                            if(recorder.is_recording):
+                                file_name = TEMP_PATH+'video.mp4'
+                                recorder.stop_recording(file_name)
+                                context['upload_file'] = gemini_ai.upload_file(path=file_name,
+                                    display_name="Video")
+                                
                             keyboard.unhook_all()
                         else:
                             keyboard.unhook_all()
@@ -561,22 +704,11 @@ if __name__ == "__main__":
 
                             if (closest_similarity > verify_threshold) and (not text_to_speech.stream.is_playing() or  (text_to_speech.stream.is_playing() and len(voice_recognition.recorder.audio) > voice_recognition.recorder.sample_rate * 2)):    # Only transcribe sentence which is > 2 seconds long when it is talking, ignore small fragments
                                 if not temp_text:
-                                    if context['vision_mode']:
-                                        if(upload_handle in scheduler.queue):
-                                            # the scheduled upload not fired yet, upload it now
-                                            scheduler.cancel(upload_handle)
-                                            upload_handle = None
-                                            start_vision_mode_photo_thread()
                                     temp_text = voice_recognition.transcribe_voice()
 
                                 text = f'**{closest_user}:**{temp_text}'
                                 voice_off_sound.play()
                             else:
-                                # If this is the case, ignore the uploading of photo
-                                if(upload_handle in scheduler.queue):
-                                    # the scheduled upload not fired yet, upload it now
-                                    scheduler.cancel(upload_handle)
-                                    upload_handle = None
                                 # do the AI_NAME match only when it is not talking and record length > 2sec, as this consumes GPU resource
                                 if not text_to_speech.stream.is_playing() and len(voice_recognition.recorder.audio) > voice_recognition.recorder.sample_rate * 2:
                                     if not temp_text:
@@ -619,10 +751,19 @@ if __name__ == "__main__":
                                 user_lists.append({'user': 'Master', 'embedding': voice_embed})
                             # sound
                             print('\a')
+
+                        if(recorder.is_recording):
+                            file_name = TEMP_PATH+'video.mp4'
+                            recorder.stop_recording(file_name)
+                            context['upload_file'] = gemini_ai.upload_file(path=file_name,
+                                display_name="Video")
                         # Request is from voice, clear some flags
                         context['system_message_in_a_row'] = 0
                         context['upload_in_a_row'] = 0
                         mInputQueue.put(text)
+                    else:
+                        if(recorder.is_recording):
+                            recorder.stop_recording(None)
                 except Exception as e:
                     print(e)
 
@@ -650,11 +791,9 @@ if __name__ == "__main__":
 
                 check_function_file()
 
-                if photo_upload_thread:
-                    photo_upload_thread.join()
-                    photo_upload_thread = None
                 parts = []
                 if context['upload_file']:
+                    gemini_ai.wait_file(context['upload_file'])
                     parts.append(context['upload_file'])
                     context['upload_file'] = None
                 parts.append(text)
