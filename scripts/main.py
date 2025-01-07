@@ -62,7 +62,7 @@ if __name__ == "__main__":
     voice_off_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}confirm.mp3")
     voice_off_sound.set_volume(0.5)
     recording_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}recording.mp3")
-    recording_sound.set_volume(0.1)
+    recording_sound.set_volume(0.2)
     start_up_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}startup.mp3")
     shutter_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}shutter.mp3")
     shutter_sound.set_volume(0.5)
@@ -568,7 +568,6 @@ if __name__ == "__main__":
             if not context['freetalk']:
                 text_to_speech.stop()
             if context['vision_mode']:
-                recording_sound.play(-1)
                 if context['vision_mode_camrea_is_screen']:
                     recorder.start_recording('screen')
                 else:
@@ -588,7 +587,6 @@ if __name__ == "__main__":
                 text = input()
                 text = f'**Master:**{text}'
                 if context['vision_mode']:
-                    recording_sound.play(-1)
                     if context['vision_mode_camrea_is_screen']:
                         recorder.start_recording('screen')
                     else:
@@ -596,7 +594,7 @@ if __name__ == "__main__":
                     time.sleep(5)
                     file_name = TEMP_PATH+'video.mp4'
                     recorder.stop_recording(file_name)
-                    recording_sound.stop()
+                    recording_sound.play()
                     context['upload_file'] = gemini_ai.upload_file(path=file_name,
                         display_name="Video")
 
@@ -670,7 +668,7 @@ if __name__ == "__main__":
                                 text = f'**Guest:**{temp_text}'
 
                             if(recorder.is_recording):
-                                recording_sound.stop()
+                                recording_sound.play()
                                 file_name = TEMP_PATH+'video.mp4'
                                 recorder.stop_recording(file_name)
                                 context['upload_file'] = gemini_ai.upload_file(path=file_name,
@@ -756,7 +754,7 @@ if __name__ == "__main__":
                             print('\a')
 
                         if(recorder.is_recording):
-                            recording_sound.stop()
+                            recording_sound.play()
                             file_name = TEMP_PATH+'video.mp4'
                             recorder.stop_recording(file_name)
                             context['upload_file'] = gemini_ai.upload_file(path=file_name,
@@ -767,7 +765,7 @@ if __name__ == "__main__":
                         mInputQueue.put(text)
                     else:
                         if(recorder.is_recording):
-                            recording_sound.stop()
+                            recording_sound.play()
                             recorder.stop_recording(None)
                 except Exception as e:
                     print(e)
