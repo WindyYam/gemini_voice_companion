@@ -765,7 +765,6 @@ if __name__ == "__main__":
                         mInputQueue.put(text)
                     else:
                         if(recorder.is_recording):
-                            recording_sound.play()
                             recorder.stop_recording(None)
                 except Exception as e:
                     print(e)
