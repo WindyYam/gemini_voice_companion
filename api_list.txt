@@ -81,12 +81,12 @@ switch_female_mode()
 # revert voice system back to default voice and role.
 switch_default_mode()
 
-# scheduling a function callback, dt is the target datetime object without timezone, cb is the callback, arg is the argument for the callback in tuple end with ','.
+# scheduling a function callback, dt is the target datetime object without timezone, cb is the callback, arg is the argument for the callback in tuple
 # no need to setup based on timezone, all local time
-schedule(dt:datetime, cb, arg=(,))
+schedule(dt:datetime, cb, arg=())
 
-# scheduling a recurring function callback, interval_sec is the interval in seconds, cb is the callback, arg is the argument for the callback in tuple end with ','.
-schedule_recurring(interval_sec, cb, arg=(,))
+# scheduling a recurring function callback, interval_sec is the interval in seconds, cb is the callback, arg is the argument for the callback in tuple
+schedule_recurring(interval_sec, cb, arg=())
 
 # clear all schedules
 clear_schedule()
