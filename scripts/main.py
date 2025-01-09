@@ -619,7 +619,8 @@ if __name__ == "__main__":
                     else:
                         recorder.start_recording('camera')
                     time.sleep(5)
-                    file_name = TEMP_PATH+'video.mp4'
+                    timestr = time.strftime("%Y%m%d-%H%M%S")
+                    file_name = f"{IMAGE_PATH}video-{timestr}.mp4"
                     recorder.stop_recording(file_name)
                     recording_sound.play()
                     context['upload_file'] = gemini_ai.upload_file(path=file_name,
@@ -698,7 +699,8 @@ if __name__ == "__main__":
 
                             if(recorder.is_recording):
                                 recording_sound.play()
-                                file_name = TEMP_PATH+'video.mp4'
+                                timestr = time.strftime("%Y%m%d-%H%M%S")
+                                file_name = f"{IMAGE_PATH}video-{timestr}.mp4"
                                 recorder.stop_recording(file_name)
                                 context['upload_file'] = gemini_ai.upload_file(path=file_name,
                                     display_name="Video")
@@ -788,7 +790,8 @@ if __name__ == "__main__":
 
                         if(recorder.is_recording):
                             recording_sound.play()
-                            file_name = TEMP_PATH+'video.mp4'
+                            timestr = time.strftime("%Y%m%d-%H%M%S")
+                            file_name = f"{IMAGE_PATH}video-{timestr}.mp4"
                             recorder.stop_recording(file_name)
                             context['upload_file'] = gemini_ai.upload_file(path=file_name,
                                 display_name="Video")
