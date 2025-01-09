@@ -140,7 +140,7 @@ if __name__ == "__main__":
             self.recording_type = None
             self.camera = camera
             # unfortunately gemini samples video in 1 frame per second. We can however sample more frames per second and output in 1 fps so it is in slow motion
-            self.fps = FPS
+            self.fps = UnifiedRecorder.FPS
             
         def capture_screen_frames(self):
             """Background thread function to capture screen frames"""
