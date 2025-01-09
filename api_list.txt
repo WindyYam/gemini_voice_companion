@@ -50,7 +50,7 @@ from datetime import datetime, date, timedelta
 # The following are the APIs to interact with the system
 ##########################################################
 # Call the system to load something to you through conversation. Call this on a variable will load variable content. Call this on an image will let you load the image. Call this on a general file path with prefix "file:" will let you load and read the file.
-# You can use this function on any API call that returns a result value to get the result. Just like print(msg) will print to the user, system_message(msg) will load and print the message to you. Don't use it to print message to user.
+# You can use this function on any API call that returns a result value to load the result into conversation.
 # be aware: can only be used once per snippet. If you want to get multiple values, try combine them as a single string
 system_message(value)
 

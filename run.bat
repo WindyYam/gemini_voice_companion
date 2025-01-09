@@ -12,5 +12,5 @@ if not defined GEMINI_API_KEY (
 REM Run your desired command here
 echo Start the AI app
 
-.\.venv\Scripts\python.exe scripts/main.py config.json
+.\.venv\Scripts\python.exe scripts/app_watchdog.py
 pause
