@@ -49,8 +49,8 @@ from datetime import datetime, date, timedelta
 # You can interact with the system, such as camera, voice output, music player, memory, keyboard, etc.
 # The following are the APIs to interact with the system
 ##########################################################
-# Call the system to load something to you through conversation. Call this on a variable will load variable content. Call this on an image will let you load the image. Call this on a general file path with prefix "file:" will let you load and read the file.
-# You can use this function on any API call that returns a result value to load the result into conversation.
+# Call the system to load python code variable content for you. Call this on a variable will load variable content. Call this on an image will let you load the image. Call this on a general file path with prefix "file:" will let you load and read the file.
+# You can use this function on any API call that returns a result value to load and print the result to you. Don't use this to print anything to me.
 # be aware: can only be used once per snippet. If you want to get multiple values, try combine them as a single string
 system_message(value)
 

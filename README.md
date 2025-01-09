@@ -70,7 +70,7 @@ After that, simply run `setup.bat` to install all dependencies.
 - **Trigger Mode**: Disable free talk mode by saying "Turn off free talk mode". Then use:
   - Tab key or media play/pause key to start speaking
   - Press the same key again to stop and get a response
-- **Vision Mode**: In this mode, During your talk period, a video will be recorded as well to provide a vision like context for the AI inference. You can ask the AI to switch to screenshot vision mode instead of default camrea vision mode, which works very well with Discord fullscreen video chat (you are the one to video chat with the AI). The downside is that video has some overhead for processing, thus introduces several seconds' delay.
+- **Vision Mode**: In this mode, During your talk period, a video will be recorded as well to provide a vision like context for the AI inference. You can ask the AI to switch to screenshot vision mode instead of default camrea vision mode, which works very well with Discord fullscreen video chat (you are the one to video chat with the AI). The downside is that video has some overhead for processing, thus introduces several seconds' delay. (Gemini samples video in 1 FPS, so our output video is 1 FPS as well, but to stuff more movement we made the video in 4x slow motion)
 - **Sleep Mode**: Tell the companion to go to sleep, it will not react to any voice activity. Only work in Free Talk mode. To wake it up again, use a phrase which contains its name. As usual, longer phrase have better recognition.
 
 ### Activating your voice

@@ -138,6 +138,8 @@ if __name__ == "__main__":
             self.recording_thread = None
             self.recording_type = None
             self.camera = camera
+            # unfortunately gemini samples video in 1 frame per second. We can however sample more frames per second and output in 1 fps so it is in slow motion
+            self.fps = 4
             
         def capture_screen_frames(self):
             """Background thread function to capture screen frames"""
@@ -146,7 +148,7 @@ if __name__ == "__main__":
                 frame = np.array(frame)
                 frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
                 self.frame_queue.put(frame)
-                time.sleep(1/24)  # ~30 FPS
+                time.sleep(1/self.fps)
                 
         def capture_camera_frames(self):
             """Background thread function to capture camera frames"""
@@ -158,7 +160,7 @@ if __name__ == "__main__":
                 frame_array = np.array(frame_buffer)
                 frame_array = cv2.cvtColor(frame_array, cv2.COLOR_RGB2BGR)
                 self.frame_queue.put(frame_array)
-                time.sleep(1/24)  # ~30 FPS
+                time.sleep(1/self.fps)
             #self.camera.stop()
 
         def start_recording(self, record_type='screen'):
@@ -230,7 +232,7 @@ if __name__ == "__main__":
                 out = cv2.VideoWriter(
                     output_filename,
                     fourcc,
-                    24.0,  # FPS
+                    1,  # Gemini sample video in 1 FPS, so higher FPS is useless in output
                     (new_width, new_height),
                     True
                 )
