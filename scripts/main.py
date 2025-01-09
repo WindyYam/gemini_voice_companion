@@ -295,28 +295,29 @@ if __name__ == "__main__":
             print(e)
             context['talk'] = []
 
-    def system_message(*values: object,
+    def system_message(*value: object,
             sep: str | None = " ",
             end: str | None = "\n",
             flush: Literal[False] = False):
         string_output = io.StringIO()
-        print(*values, file=string_output, sep=sep, end=end, flush=flush)
+        print(*value, file=string_output, sep=sep, end=end, flush=flush)
         response = string_output.getvalue().strip()
-        if context['vision_mode'] and ".jpg" in response:
-            print('In photo stream mode, no need to upload capture photo here.')
-            return
         if context['system_message_in_a_row'] < 3 and context['upload_in_a_row'] < 2:
             context['system_message_in_a_row'] += 1
-            if response.endswith('.jpg'):
-                image_file = string_output.getvalue().strip()
-                context['upload_file'] = gemini_ai.upload_file(image_file, display_name='Photo')
-                response = 'This is the photo.'
-                context['upload_in_a_row'] += 1
-            elif response.endswith('.txt'):
-                txt_file = response
-                context['upload_file'] = gemini_ai.upload_file(txt_file, display_name='Text')
-                response = 'This is the content.'
-                context['upload_in_a_row'] += 1
+            if response.startswith('file:'):
+                filename = response.split(':', maxsplit=1)[1]
+                if response.endswith('.jpg'):
+                    context['upload_file'] = gemini_ai.upload_file(filename, display_name='Photo')
+                    response = 'This is the photo.'
+                    context['upload_in_a_row'] += 1
+                elif response.endswith('.txt'):
+                    context['upload_file'] = gemini_ai.upload_file(filename, display_name='Text')
+                    response = 'This is the content.'
+                    context['upload_in_a_row'] += 1
+                else:
+                    context['upload_file'] = gemini_ai.upload_file(filename, display_name='File')
+                    response = 'This is the content.'
+                    context['upload_in_a_row'] += 1
             response = f"**System:**{response}"
             mInputQueue.put(response)
             string_output.close()
@@ -349,7 +350,7 @@ if __name__ == "__main__":
         photo_path = f"{IMAGE_PATH}camera-{timestr}.jpg"
         # saving the image 
         pygame.image.save(img, photo_path)
-        return photo_path
+        return 'file:'+photo_path
     
     def screenshot() -> str:
         # Capture the screenshot
@@ -370,7 +371,7 @@ if __name__ == "__main__":
 
         # Save the screenshot as JPG
         screenshot.save(filename, "JPEG")
-        return filename
+        return 'file:'+filename
     
     def capture_upload_photo():
         if context['vision_mode_camrea_is_screen']:

@@ -45,6 +45,7 @@ Answer phone call(remote usage): https://youtu.be/kon9clc4MDQ
 - **Vision Mode**: Record a video for AI inference when you are talking, either from the camrea or from screen record (if you are doing discord video chat with the AI, the screen record mode let the AI see the camera video from your mobile phone)
 - **Write Diary Entry**: It can upload the conversation history today and then you can ask the AI to write diary entry based on that. You will have to explicitly ask the AI to access the history for reference(it is recommended to start a new conversation for AI after that as the history file can be huge which slows down the subsequential requests).
 - **Memorize Information**: It can memorize information and save locally, like the user's preference on music, user's family informations. You can explicitly ask it to remember something or write something down. The max number of memory items can be adjusted in `config.json`
+- **Analyze a general file**: It can upload and analyze a general file (in supported format, like jpg, png, pdf, txt etc.) under a file path of your PC. e.g. Summarize the content of file in "C:/example.txt". (It might be better to use other way like the keyboard to type in the path, or use some indirect way to provide the path, as voice is not very helpful in inputing path here)
 
 - For more detail of the API it can use, see the api_list.txt.
 
