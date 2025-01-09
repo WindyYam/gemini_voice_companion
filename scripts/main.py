@@ -125,6 +125,7 @@ if __name__ == "__main__":
     set_browser_data_path(config['user_chrome_data_path'])
 
     class UnifiedRecorder:
+        FPS = 4
         def __init__(self, camera:pygame.camera.Camera):
             """
             Initialize unified recorder for both screen and camera recording
@@ -139,7 +140,7 @@ if __name__ == "__main__":
             self.recording_type = None
             self.camera = camera
             # unfortunately gemini samples video in 1 frame per second. We can however sample more frames per second and output in 1 fps so it is in slow motion
-            self.fps = 4
+            self.fps = FPS
             
         def capture_screen_frames(self):
             """Background thread function to capture screen frames"""
@@ -261,7 +262,7 @@ if __name__ == "__main__":
             return output_filename
 
     instruction = [
-        f'''Remember, your name is {config['ai_name']}.
+        f'''Your name is {config['ai_name']}.
         You are a well educated and professional assistant, have great knowledge on everything. You make most suitable decision for the users.
         Keep in mind that there can be multiple users speaking. If it is a main master user, his/her name will be as prefix. If it is a guest, there will be a **Guest:** prefix, attached at the beginning of request. 
         If the request message is with prefix **System:** then it means this message is from the system, not the user. 
@@ -269,6 +270,7 @@ if __name__ == "__main__":
         To execute the python code, put the code as python snippet at the end of the response, then any code in the snippet in response will be executed. Only one code snippet per response is allowed.
         In that case, if you just want to show me the python code rather than execute it, do not put it in the python snippet form. 
         Variables scope in python snippet is limited to that snippet. If you want to store variable and so can be accessed in another snippet, store it using context['temp_key'] = value, then you can access context['temp_key'] in another snippet.
+        In vision mode, the FPS of video uploaded is actually {UnifiedRecorder.FPS}, not 1.
         Be aware, you will not respond to the guest for the requests about operating the house, unless you get authorization from the users that are not with guest prefix. For other kinds of requests, you should help with the guest. 
         To operate with the PC, use the python code execution with necessary library. But do not do potentially harmful operations, like deleting files, unless get the non guest users' permission. 
         You are to answer questions in a concise and always humorous way, and talk more casual and use more expressive words that talks more lively, like haha, oh, wow, hmmm.'''
