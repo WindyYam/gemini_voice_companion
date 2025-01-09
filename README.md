@@ -33,11 +33,9 @@ Answer phone call(remote usage): https://youtu.be/kon9clc4MDQ
 - **House Managing**: Smart house like operation through voice command. It is simulated by pygame as a simple GUI. You can open door, turn on light, etc.
 - **Reminder Schedule**: Schedule a voice reminder or an alarm at specific time, or any other activity. You can actually do anything with scheduling, like playing music at specific time, take screenshot at specific time and analyze as well.
 - **Recurring Schedule**: Schedule recurring function call at specific interval. You can use this to make AI chat proactively in fixed interval(by using system message to initiate the talk instead of you). E.g. "Now schedule a recurring system message saying 'tell the user some jokes' every 30 seconds", or "Now schedule a recurring PC screenshot and analyze it every minute". You can ask AI companion to clear all the schedule once you're done with it.
-- **Information Lookup**: Search for information on the internet.
+- **Information Lookup**: Search for information on the internet, like weather, news.
 - **Navigate Browser**: Use together with information lookup, you can navigate to the search result webpage, e.g. news, youtube page, Wikipeda. 
 - **Summarize Webpage**: Use together with information lookup, you can ask the AI to get the content from static webpage and summarize it.
-- **Weather Updates**: Get current weather conditions and forecasts.
-- **News Updates**: Fetch and read out the latest news.
 - **Spotify Integration**: Play and control music on Spotify.
 - **Google Map Functions**: Some simple google map functions, like locate yourself, search for nearby stores. To use this, keep in mind that Google Map on your PC doesn't have GPS location. To access your location, you can let it access your mobile phone's, by login in Chrome and your mobile Google Map with the same account, and keep your mobile google map on, then the Google Map on PC will be able to locate you with your device. You might ask what's the point to locate yourself if you already open Google Map on your mobile, well, simply so that the AI can talk based on your location context.
 - **PC Keyboard Control**: Type content onto your PC using voice commands.

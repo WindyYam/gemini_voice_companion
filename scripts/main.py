@@ -356,16 +356,17 @@ if __name__ == "__main__":
         # Capture the screenshot
         screenshot = ImageGrab.grab()
         shutter_sound.play()
-        if context['vision_mode'] and context['vision_mode_camrea_is_screen']:
-            # In this mode, we scale down to half size, as the main purpose of this mode is to get the live video snapshot from discord video chat, which is actually low res
-            width, height = screenshot.size
 
-            # Calculate the new dimensions (half of the original)
-            new_width = width // 2
-            new_height = height // 2
+        # Half the resolution to minimize tokens used and increase speed
+        width, height = screenshot.size
 
-            # Resize the image to half resolution
-            screenshot = screenshot.resize((new_width, new_height), Image.LANCZOS)
+        # Calculate the new dimensions (half of the original)
+        new_width = width // 2
+        new_height = height // 2
+
+        # Resize the image to half resolution
+        screenshot = screenshot.resize((new_width, new_height), Image.LANCZOS)
+
         timestr = time.strftime("%Y%m%d-%H%M%S")
         filename = f"{IMAGE_PATH}screenshot-{timestr}.jpg"
 
