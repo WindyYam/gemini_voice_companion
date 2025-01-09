@@ -560,14 +560,36 @@ if __name__ == "__main__":
         gemini_ai = GeminiAI(model_name=config['model_name'], system_instruction=instruction)
 
         def check_function_file():
-            try:
-                if not talk_header[0]['parts'][0]:
-                    function_file = gemini_ai.upload_file(path="api_list.txt", display_name="Python API")
-                    talk_header[0]['parts'][0] = function_file
-            except Exception as e:
-                print(e)
-                with wdt_feed_lock2:
-                    text_to_speech.speak('Hmm, looks like some connection issues out there.')
+            needUpload = False
+            if not talk_header[0]['parts'][0]:
+                needUpload = True
+            else:
+                try:
+                    test = gemini_ai.get_file(talk_header[0]['parts'][0].name)
+                except Exception as e:
+                    needUpload = True
+
+            if needUpload:
+                try:
+                    if not talk_header[0]['parts'][0]:
+                        function_file = gemini_ai.upload_file(path="api_list.txt", display_name="Python API")
+                        talk_header[0]['parts'][0] = function_file
+                except Exception as e:
+                    print(e)
+                    with wdt_feed_lock2:
+                        text_to_speech.speak('Hmm, looks like some connection issues out there.')
+
+        def check_history_files():
+            for item in context['talk']:
+                for i, part in enumerate(item['parts']):
+                    if part is SerializableFile:
+                        try:
+                            test = gemini_ai.get_file(part.name)
+                        except Exception as e:
+                            print(e)
+                            print('Some of the files are invald, clear the file reference')
+                            # some of the file might be invalid already(might due to TTL in the server), just clear the reference for now
+                            item['parts'][i] = ' '
 
         def on_record_start():
             if not context['freetalk']:
@@ -809,6 +831,9 @@ if __name__ == "__main__":
         exceptionCounter = 0
         while True:
             try:
+                check_function_file()
+                check_history_files()
+
                 # only fetch the latest text msg
                 if mInputQueue.qsize() > 0:
                     while(not (mInputQueue.qsize() == 0)):
@@ -817,8 +842,6 @@ if __name__ == "__main__":
                     text = mInputQueue.get()
                 if text == '':
                     continue
-
-                check_function_file()
 
                 parts = []
                 if context['upload_file']:

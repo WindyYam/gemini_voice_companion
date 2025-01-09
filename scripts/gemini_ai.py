@@ -22,6 +22,7 @@ class GeminiAI:
             for item in lists:
                 print(item.name, item.mime_type, item.display_name)
         except Exception as e:
+            print(e)
             pass
         
         self.model = self._initialize_model(model_name, system_instruction)

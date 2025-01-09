@@ -130,7 +130,7 @@ class Browser:
 
         filename = self.temp_dir + 'browser_snapshot.jpg'
         resized_image.save(filename, 'JPEG', quality=50)
-        return filename
+        return 'file:'+filename
     
     def search_map(self, query):
         self.locate_in_map()

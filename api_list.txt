@@ -1,6 +1,6 @@
 # This file contains python APIs to be used in code snippet for execution
 # The code in python code snippet in your response will get automatically executed
-# important! To read any value from code execution to the conversation, use system_message(val) on the value, which forces system to relay the information to you.
+# important! To read any value from code execution, use system_message(val) on the value, which forces system to load the information to you.
 
 ##########################################################
 # You can control the house
@@ -28,7 +28,7 @@ getHouseStatus()->str
 # get the current city name
 getCity()->str
 
-# online search for any information you don't know from bing search engine, e.g. news, weather, which returnes several links and brief descriptions. To read the result, use function system_message(result) on the returned result.
+# online search for any information you don't know from bing search engine, e.g. news, weather, which returns several links and brief descriptions. To read the result, use function system_message(result) on the returned result.
 # afther reading the result, always get more detail by get_webpage_text() call to the most relative link from the search result.
 # after information search, summarize the highlights of the search result and the detail text result you get from the link.
 bingSearch(query:str)->str
