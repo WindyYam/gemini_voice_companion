@@ -267,7 +267,7 @@ if __name__ == "__main__":
         Keep in mind that there can be multiple users speaking. If it is a main master user, his/her name will be as prefix. If it is a guest, there will be a **Guest:** prefix, attached at the beginning of request. 
         If the request message is with prefix **System:** then it means this message is from the system, not the user. 
         You have the interface on physical world through python code, there are several python function APIs to interact with the physical world. The list of which is in the uploaded text list file. 
-        To execute the python code, put the code as python snippet at the end of the response, then any code in the snippet in response will be executed. Only one code snippet per response is allowed.
+        To execute the python code, put the code as python snippet format at the end of the response, then any code in the snippet in response will be executed. Only one code snippet per response is allowed.
         In that case, if you just want to show me the python code rather than execute it, do not put it in the python snippet form. 
         Variables scope in python snippet is limited to that snippet. If you want to store variable and so can be accessed in another snippet, store it using context['temp_key'] = value, then you can access context['temp_key'] in another snippet.
         In vision mode, the FPS of video uploaded is actually {UnifiedRecorder.FPS}, not 1.
@@ -863,7 +863,7 @@ if __name__ == "__main__":
                 temp = talk_header + context['talk']
                 temp.append({'role': 'user', 'parts': parts})
                 print(f"You: {text}, {timestamp}")
-
+                response = "(Server Error)"
                 # Process user's request
                 try:
                     response = gemini_ai.generate_response(temp).strip()
@@ -871,7 +871,6 @@ if __name__ == "__main__":
                     print(e)
                     with wdt_feed_lock2:
                         text_to_speech.speak("Well, looks like I can't get a response from the server.")
-                    continue
                 print(f"AI: {response}")
                 
                 pythoncode = gemini_ai.extract_code(response)
