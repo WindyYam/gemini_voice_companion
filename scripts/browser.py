@@ -1,5 +1,6 @@
 import io
 from selenium import webdriver
+from selenium.common import exceptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -8,6 +9,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 from PIL import Image
+import os
+import platform
 
 class Browser:
     def __init__(self, user_data_dir, profile_directory, temp_dir='temp/'):
@@ -19,7 +22,20 @@ class Browser:
         self.temp_dir = temp_dir
 
     def start_driver(self):
-        self.driver = webdriver.Chrome(options=self.chrome_options)
+        try:
+            self.driver = webdriver.Chrome(options=self.chrome_options)
+        except exceptions.SessionNotCreatedException as e:
+            # Let's close all chromes here
+            system = platform.system().lower()
+            if system == "windows":
+                os.system("taskkill /im chrome.exe /f")
+            elif system == "darwin":  # macOS
+                os.system("pkill -a 'Google Chrome'")
+            elif system == "linux":
+                os.system("pkill chrome")
+            else:
+                print(f"Unsupported operating system: {system}")
+            #raise
 
     def navigate_to(self, url):
         if not self.driver:
@@ -33,6 +49,7 @@ class Browser:
         except Exception as e:
             print(f"An error occurred: {e}")
             self.close_driver()
+            raise
 
     def play_song(self, song_name):
         if not self.driver:
@@ -75,6 +92,7 @@ class Browser:
         except Exception as e:
             print(f"An error occurred: {e}")
             self.close_driver()
+            raise
         
         return False
     
