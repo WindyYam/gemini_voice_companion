@@ -915,6 +915,8 @@ if __name__ == "__main__":
             except Exception as e:
                 print(e)
                 print('\a')
+                with wdt_feed_lock2:
+                    text_to_speech.speak("Ops, some error happened.")
                 exceptionCounter += 1
                 if exceptionCounter > 20:
                     with wdt_feed_lock2:
