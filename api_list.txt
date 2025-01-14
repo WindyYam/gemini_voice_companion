@@ -57,7 +57,7 @@ system_message(value)
 # turning on/off vision mode so it will attach a photo on every request to you as your vision, arg on is True/False, type can be 'camera' or 'screenshot' to indicate image source. When vision mode is set on, you don't need system_message() for the photo
 vision_mode(on, type)
 
-# take a photo through the camera. this return the photo image. To load that photo image, put system_message(photo_image) in the code snippet.
+# take a photo through the camera. this return the photo image. To analyze that photo image, put system_message(photo_image) in the code snippet.
 camera_shot() -> str
 
 # switch voice system to user voice to mimic the user's voice tone only, and your personality keeps unchanged.
@@ -124,7 +124,7 @@ freetalk_mode(on:bool)
 # call this to summarize our talk history, and start a new conversation with the summary. you should generate the detailed summary of all our talk history as argument, and always use raw triple quotes """ for the text.
 start_new_conversation(summary:str)
 
-# take the screenshot of the PC you are running on, return the photo image. To load that photo image, put system_message(photo_image) in the code snippet.
+# take the screenshot of the PC you are running on, return the photo image. To analyze that photo image, put system_message(photo_image) in the code snippet.
 screenshot() -> str
 
 # type in the text using keyboard API into the PC. Always use raw triple quotes """ for the text.
