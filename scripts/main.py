@@ -63,11 +63,16 @@ if __name__ == "__main__":
     voice_off_sound.set_volume(0.5)
     recording_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}recording.mp3")
     recording_sound.set_volume(0.2)
+    memory_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}memory.mp3")
+    memory_sound.set_volume(0.2)
+    delete_memory_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}deletememory.mp3")
+    delete_memory_sound.set_volume(0.2)
     start_up_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}startup.mp3")
     shutter_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}shutter.mp3")
     shutter_sound.set_volume(0.5)
     recurring_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}recurring.mp3")
     power_off_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}poweroff.mp3")
+    power_on_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}poweron.mp3")
     today = str(date.today())
     evt_enter = threading.Event()
     wdt_feed_lock1 = threading.Lock()
@@ -514,6 +519,7 @@ if __name__ == "__main__":
             context['memory'] = context['memory'][-config['max_memory']:]
         update_memory_str()
         save_memory()
+        memory_sound.play()
 
     def load_memory():
         try:
@@ -527,6 +533,7 @@ if __name__ == "__main__":
         context['memory'].clear()
         update_memory_str()
         save_memory()
+        delete_memory_sound.play()
 
     def main():
         global context, gemini_ai, voice_recognition, text_to_speech, cam, mInputQueue, photo_upload_thread, upload_handle, gemini_ai
@@ -726,6 +733,7 @@ if __name__ == "__main__":
                             if config['ai_name'] in temp_text:
                                 print('Exit sleep')
                                 context['sleep'] = False
+                                power_on_sound.play()
                         if not context['sleep']:
                             # in free talk mode, we verify the speaker
                             voice_embed = voice_recognition.generate_embed(voice_recognition.recorder.audio)
