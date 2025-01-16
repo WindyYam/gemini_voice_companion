@@ -1,6 +1,6 @@
 # This file contains python APIs to be used in code snippet for execution
 # The code in python code snippet in your response will get automatically executed
-# important! To read any value from code execution, use system_message(val) on the value, which forces system to load the information to you.
+# important! To read any value from code execution, use system_message(val) on the value, which forces system to send the content to you.
 
 ##########################################################
 # You can control the house
@@ -29,8 +29,8 @@ getHouseStatus()->str
 getCity()->str
 
 # online search for any information you don't know from web search engine, e.g. news, weather, which returns several links and brief descriptions. To read the result, use function system_message(result) on the returned result.
-# afther reading the result, always get more detail by get_webpage_text() call to the most relative link from the search result.
-# after information search, summarize the highlights of the search result and the detail text result you get from the link.
+# after the search, always get more detail by get_webpage_text() call to the most relative link from the search result.
+# after getting detail, summarize the highlights of the search result and the detail text result you get from the link in a concise way.
 webSearch(query:str)->str
 
 # get webpage content text. always call this to get the detail on the most relevant link after web search.
@@ -49,8 +49,8 @@ from datetime import datetime, date, timedelta
 # You can interact with the system, such as camera, voice output, music player, memory, keyboard, etc.
 # The following are the APIs to interact with the system
 ##########################################################
-# Call the system to load python code variable content for you. Call this on a variable will load variable content. Call this on an image will let you load the image. Call this on a general file path with prefix "file:" will let you load and read the file.
-# You can use this function on any API call that returns a result value to load and print the result to you. Don't use this to print anything to me.
+# Indicate the system to send python variable content to you. Call this on a variable will give variable content. Call this on an image will give you image. Call this on a general file path with prefix "file:" will give you file content.
+# You can use this function on any API call that returns a result value to send the result to you. It can't be used to send anything to the user.
 # be aware: can only be used once per snippet. If you want to get multiple values, try combine them as a single string
 system_message(value)
 
