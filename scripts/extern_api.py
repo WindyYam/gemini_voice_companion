@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import test_game
+from urllib.parse import quote_plus
 
 player = None
 
@@ -55,34 +56,69 @@ def getCity()->str:
     return(citydata)
 
 # online search for any information you don't know from bing search engine 
-def bingSearch(query:str)->str:
+def webSearch(query:str, max_results=10)->str:
+    """
+    Scrape search results from DuckDuckGo
+    
+    Args:
+        query: Search query string
+        max_results: Maximum number of results to return (default 10)
+        
+    Returns:
+        List of dictionaries containing search results with title, description, and URL
+    """
+    
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
     }
-    url = f'https://bing.com/search?q={query.replace(" ","+")}'
-
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.text, 'html.parser')
-
-    search_results = []
-
-    for result in soup.find_all('li', class_='b_algo'):
-        try:
-            anchor = result.find('a')
-            title = anchor.text
-            url = result.find('a')['href']
-            desc = result.find('p') or anchor
-            description= desc.text
-            
-            search_results.append({
-                'title': title,
-                'description': description,
-                'url': url
-            })
-        except Exception as e:
-            pass
     
-    return json.dumps(search_results)
+    # Encode query for URL
+    encoded_query = quote_plus(query)
+    url = f'https://html.duckduckgo.com/html/?q={encoded_query}'
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        search_results = []
+        
+        # Find all result containers
+        results = soup.find_all('div', class_='result')
+        
+        for result in results[:max_results]:
+            try:
+                # Extract title and URL
+                title_elem = result.find('a', class_='result__a')
+                if not title_elem:
+                    continue
+                    
+                title = title_elem.get_text(strip=True)
+                url = title_elem.get('href', '')
+                
+                # Extract description
+                desc_elem = result.find('a', class_='result__snippet')
+                description = desc_elem.get_text(strip=True) if desc_elem else ''
+                
+                if title and url:
+                    search_results.append({
+                        'title': title,
+                        'description': description,
+                        'url': url
+                    })
+                    
+            except Exception as e:
+                print(f"Error parsing result: {str(e)}")
+                continue
+                
+        return search_results
+        
+    except requests.RequestException as e:
+        print(f"Error making request: {str(e)}")
+        return []
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+        return []
 
 # get webpage context in plain text
 def get_webpage_text(url):
@@ -194,5 +230,5 @@ def get_clipboard_text() -> str:
     return s
 
 if __name__ == "__main__":
-    ret = bingSearch(query='News')
+    ret = webSearch(query='Trump News')
     print(ret)

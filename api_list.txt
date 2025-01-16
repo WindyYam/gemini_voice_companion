@@ -28,12 +28,12 @@ getHouseStatus()->str
 # get the current city name
 getCity()->str
 
-# online search for any information you don't know from bing search engine, e.g. news, weather, which returns several links and brief descriptions. To read the result, use function system_message(result) on the returned result.
+# online search for any information you don't know from web search engine, e.g. news, weather, which returns several links and brief descriptions. To read the result, use function system_message(result) on the returned result.
 # afther reading the result, always get more detail by get_webpage_text() call to the most relative link from the search result.
 # after information search, summarize the highlights of the search result and the detail text result you get from the link.
-bingSearch(query:str)->str
+webSearch(query:str)->str
 
-# get webpage content text. always call this to get the detail on the most relevant link after bing search.
+# get webpage content text. always call this to get the detail on the most relevant link after web search.
 get_webpage_text(url:str)->str
 
 ##########################################################
