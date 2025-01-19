@@ -1,6 +1,6 @@
 # This file contains python APIs to be used in code snippet for execution
 # The code in python code snippet in your response will get automatically executed
-# important! To read any value from code execution, use system_message(val) on the value, which forces system to send the content to you.
+# To analyze any value in the python code, call system_message(val) on the value, will send the value content to you (the AI).
 
 ##########################################################
 # You can control the house
@@ -28,12 +28,12 @@ getHouseStatus()->str
 # get the current city name
 getCity()->str
 
-# online search for any information you don't know from web search engine, e.g. news, weather, which returns several links and brief descriptions. To read the result, use function system_message(result) on the returned result.
+# online search for any information from web search engine, e.g. news, weather, which returns several links and brief descriptions. Use function system_message(result) on the returned result to analyze the result.
 # after the search, always get more detail by get_webpage_text() call to the most relative link from the search result.
 # after getting detail, summarize the highlights of the search result and the detail text result you get from the link in a concise way.
 webSearch(query:str)->str
 
-# get webpage content text. always call this to get the detail on the most relevant link after web search.
+# get webpage content text. always call this to get the detail on the most relevant link after web search. Use function system_message(text) on the returned text to analyze the result.
 get_webpage_text(url:str)->str
 
 ##########################################################
@@ -94,7 +94,8 @@ clear_schedule()
 # play an alarm sound
 play_alarm_sound()
 
-# speak the text content in voice using text to speech, as to notice the user. Always use raw triple quotes """ for the text.
+# speak the text content in voice using text to speech, as to notice the user. Always use raw triple quotes """ for the text. 
+# only use this on a schedule event or any callback function.
 play_text_voice(text:str)
 
 # search and play the music with "name" in spotify, always use raw triple quotes """ for the text. If it doesn't work, remind the user to try close all Chrome instance.
