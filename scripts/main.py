@@ -897,7 +897,7 @@ if __name__ == "__main__":
                     return "\n".join([line for line in s.split('\n') if not line.strip().startswith('#')])
                 pythoncode = remove_comment_lines(pythoncode).strip()
                 thread = None
-                if(pythoncode != ''):
+                if(pythoncode != '' and pythoncode !='pass'):
                     print(f'code: {pythoncode}')
                     thread = threading.Thread(target=exec_code, args=(pythoncode,))
                     # Start the thread
