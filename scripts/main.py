@@ -871,14 +871,12 @@ if __name__ == "__main__":
                 temp = talk_header + context['talk']
                 temp.append({'role': 'user', 'parts': parts})
                 print(f"You: {text}, {timestamp}")
-                response = "(Server Error)"
+                response = "(Well, looks like I can't get a response from the server.)"
                 # Process user's request
                 try:
                     response = gemini_ai.generate_response(temp).strip()
                 except Exception as e:
                     print(e)
-                    with wdt_feed_lock2:
-                        text_to_speech.speak("Well, looks like I can't get a response from the server.")
                 print(f"AI: {response}")
                 
                 pythoncode = gemini_ai.extract_code(response)
