@@ -37,7 +37,7 @@ if __name__ == "__main__":
         'talk': [],
         'upload_file': None,
         'vision_mode': False,
-        'system_message_in_a_row': 0,   # This and the following is to prevent system message trigger infinite system message loop. Sometimes the AI will post system_message in a response to system_message and loop it forever.
+        'load_value_in_a_row': 0,   # This and the following is to prevent system message trigger infinite system message loop. Sometimes the AI will post load_value in a response to load_value and loop it forever.
         'upload_in_a_row': 0,
         'freetalk': True,
         'sleep': False,
@@ -306,15 +306,15 @@ if __name__ == "__main__":
             print(e)
             context['talk'] = []
 
-    def system_message(*value: object,
+    def load_value(*value: object,
             sep: str | None = " ",
             end: str | None = "\n",
             flush: Literal[False] = False):
         string_output = io.StringIO()
         print(*value, file=string_output, sep=sep, end=end, flush=flush)
         response = string_output.getvalue().strip()
-        if context['system_message_in_a_row'] < 3 and context['upload_in_a_row'] < 2:
-            context['system_message_in_a_row'] += 1
+        if context['load_value_in_a_row'] < 3 and context['upload_in_a_row'] < 2:
+            context['load_value_in_a_row'] += 1
             if response.startswith('file:'):
                 filename = response.split(':', maxsplit=1)[1]
                 if response.endswith('.jpg'):
@@ -408,7 +408,7 @@ if __name__ == "__main__":
             fail_sound.play()
             err_msg = f'Code exec exception: {e}'
             print(err_msg)
-            system_message(err_msg)
+            load_value(err_msg)
 
     def event_thread():
         clock = pygame.time.Clock()
@@ -429,7 +429,7 @@ if __name__ == "__main__":
         print('Recurring event')
         recurring_sound.play()
         # Might resulting a request from recurring event, clear some flags
-        context['system_message_in_a_row'] = 0
+        context['load_value_in_a_row'] = 0
         context['upload_in_a_row'] = 0
         cb(*arg)
         scheduler.enter(interval_sec, 1, recurring_wrapper, argument=(interval_sec, cb, arg))
@@ -638,7 +638,7 @@ if __name__ == "__main__":
                         display_name="Video")
 
                 # Request is from keyboard, clear some flags
-                context['system_message_in_a_row'] = 0
+                context['load_value_in_a_row'] = 0
                 context['upload_in_a_row'] = 0
                 mInputQueue.put(text)
 
@@ -808,7 +808,7 @@ if __name__ == "__main__":
                             context['upload_file'] = gemini_ai.upload_file(path=file_name,
                                 display_name="Video")
                         # Request is from voice, clear some flags
-                        context['system_message_in_a_row'] = 0
+                        context['load_value_in_a_row'] = 0
                         context['upload_in_a_row'] = 0
                         mInputQueue.put(text)
                     else:
@@ -876,7 +876,7 @@ if __name__ == "__main__":
                 try:
                     response = gemini_ai.generate_response(temp).strip()
                 except Exception as e:
-                    print(e)
+                    response = f'({e})'
                 print(f"AI: {response}")
                 
                 pythoncode = gemini_ai.extract_code(response)
@@ -902,7 +902,7 @@ if __name__ == "__main__":
                     thread.start()
                 else:
                     # no code this round, clear some flags
-                    context['system_message_in_a_row'] = 0
+                    context['load_value_in_a_row'] = 0
                     context['upload_in_a_row'] = 0
                 # Speak the response
                 if voice_text != '':
