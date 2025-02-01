@@ -29,8 +29,8 @@ getHouseStatus()->str
 getCity()->str
 
 # online search for any information from web search engine, e.g. news, weather, which returns several links and brief descriptions. Always use function load_value(result) on the returned result to analyze the result.
-# after the search, always get more detail by get_webpage_text() call to the most relative link from the search result.
-# after getting detail, summarize the highlights of the search result and the detail text result you get from the link in a concise way.
+# after the search, always get more detail by get_webpage_text() call to the most relative link from the search result. To get multiple web contents in one go, combine the text into a dict and then call load_value(dict)
+# after getting detail, summarize the highlights from all the gathered information in a short concise way.
 webSearch(query:str)->str
 
 # get webpage content text. always call this to get the detail on the most relevant link after web search. Always use function load_value(text) on the returned text to analyze the result.
@@ -51,7 +51,7 @@ from datetime import datetime, date, timedelta
 ##########################################################
 # Get the code execution result. Call this on a variable will give variable content. Call this on an image will give you image. Call this on a general file path with prefix "file:" will give you file content.
 # You can use this function on any API call that returns a result value to get the execution result. 
-# be aware: can only be used once per snippet. If you want to get multiple values, try combine them as a single string
+# be aware: can only be used once per snippet. If you want to get multiple values, combine the values into a dict and then call load_value(dict)
 load_value(value)
 
 # turning on/off vision mode so it will attach a photo on every request to you as your vision, arg on is True/False, type can be 'camera' or 'screenshot' to indicate image source. When vision mode is set on, you don't need load_value() for the photo
