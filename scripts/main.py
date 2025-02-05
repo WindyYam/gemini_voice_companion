@@ -411,11 +411,9 @@ if __name__ == "__main__":
             load_value(err_msg)
 
     def event_thread():
-        clock = pygame.time.Clock()
-
         while True:
             try:
-                clock.tick(10)
+                time.sleep(0.1)
                 scheduler.run(blocking=False)
             except Exception as e:
                 print(e)

@@ -14,6 +14,7 @@ Quick Rundown: https://youtu.be/6eXayNvU6ds
 Introduction: https://youtu.be/6NTnIVsfiNM
 In-car usage: https://youtu.be/Fer7pBjVmyA
 Answer phone call(remote usage): https://youtu.be/kon9clc4MDQ
+Discord Video Vision: https://youtu.be/La9BApz4LbY
 
 ## Core dependencies
 
