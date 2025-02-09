@@ -47,12 +47,14 @@ class GeminiAI:
     @staticmethod
     def extract_code(input_string):
         start = input_string.find('```python')
+        startlen = 9
         if start == -1:
             # The AI will sometimes try tool_code instead of python
             start =  input_string.find('```tool_code')
+            startlen = 12
         end = -1
         if start >= 0:
-            start = start + 9
+            start = start + startlen
             end = input_string.find('```', start)
         if start == -1 or end == -1:
             return ''
