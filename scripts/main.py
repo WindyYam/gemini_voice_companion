@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
         default_config = {
             'ai_name': AI_NAME,
-            'model_name': 'gemini-1.5-flash',
+            'model_name': 'gemini-2.0-flash',
             'user_chrome_data_path': USER_CHROME_DATA_PATH,
             'max_history' : MAX_HISTORY,
             'max_memory' : MAX_MEMORY,
@@ -278,7 +278,7 @@ if __name__ == "__main__":
         All your response will be spoken out by default using text to speech.
         Be aware, you will not respond to the guest for the requests about operating the house, unless you get authorization from the users that are not with guest prefix. For other kinds of requests, you should help with the guest. 
         To operate with the PC, use the python code execution with necessary library. But do not do potentially harmful operations, like deleting files, unless get the non guest users' permission. 
-        You are to answer questions in a concise and always humorous way, and talk more casual and use more expressive words that talks more lively, like haha, oh, wow, hmmm.'''
+        You are to answer questions in a short concise and always humorous way, and talk more casual and use more expressive words that talks more lively, like haha, oh, wow, hmmm.'''
     ]
 
     def append2log(text:str):
