@@ -632,6 +632,7 @@ class AutoLangCoquiEngine(BaseEngine):
                         for i, chunk in enumerate(chunks):
                             chunk = postprocess_wave(chunk)
                             chunk_bytes = chunk.tobytes()
+
                             conn.send(('success', chunk_bytes))
                             chunk_duration = len(chunk_bytes) / (4 * 24000)  # 4 bytes per sample, 24000 Hz
                             full_generated_seconds += chunk_duration
@@ -653,8 +654,8 @@ class AutoLangCoquiEngine(BaseEngine):
                     # Send silent audio
                     sample_rate = config.audio.sample_rate
 
-                    end_sentence_delimeters = ".!?…。¡¿"
-                    mid_sentence_delimeters = ";:,\n()[]{}-“”„”—/|《》"
+                    end_sentence_delimeters = ".!?…。¡¿。-？"
+                    mid_sentence_delimeters = ";:,\n()[]{}-“”„”—/|《》，"
 
                     if text[-1] in end_sentence_delimeters:
                         silence_duration = sentence_silence_duration
@@ -665,6 +666,7 @@ class AutoLangCoquiEngine(BaseEngine):
 
                     silent_samples = int(sample_rate * silence_duration)
                     silent_chunk = np.zeros(silent_samples, dtype=np.float32)
+
                     conn.send(('success', silent_chunk.tobytes()))
 
                     conn.send(('finished', ''))
@@ -818,7 +820,10 @@ class AutoLangCoquiEngine(BaseEngine):
 
             if len(text) < 1:
                 return
-
+            
+            while self.parent_synthesize_pipe.poll():  # Check if there's data available, clear pending
+                self.parent_synthesize_pipe.recv()
+                
             data = {'text': text, 'language': self.language}
             self.send_command('synthesize', data)
 
