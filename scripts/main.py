@@ -874,7 +874,7 @@ if __name__ == "__main__":
                 try:
                     response = gemini_ai.generate_response(temp).strip()
                 except Exception as e:
-                    response = f'({e})'
+                    print(f'(Exception: {e})')
                 print(f"AI: {response}")
                 
                 pythoncode = gemini_ai.extract_code(response)
