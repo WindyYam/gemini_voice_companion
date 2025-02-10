@@ -52,7 +52,7 @@ class TextToSpeech:
     def speak(self, text:str):
         text = text.replace('*', ' ')
         self.stream.feed(text)
-        self.stream.play_async(sentence_fragment_delimiters = ".?!;,\n…{[())]}。-？，")
+        self.stream.play(sentence_fragment_delimiters = ".?!;,\n…{[())]}。-？，")
 
     def switch_user_voice(self, audio):
         self.vader_breath.stop()

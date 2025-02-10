@@ -41,8 +41,8 @@ class GeminiAI:
         )
 
     def generate_response(self, parts:list):
-        response = self.model.generate_content(parts, stream=False, request_options=RequestOptions(timeout=30))
-        return response.text
+        response = self.model.generate_content(parts, stream=True, request_options=RequestOptions(timeout=30))
+        return response
 
     @staticmethod
     def extract_code(input_string):
