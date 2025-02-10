@@ -899,8 +899,11 @@ if __name__ == "__main__":
                 def responseAnalyze(response):
                     # need to filter out ```` code blocks
                     inside_block = False
+
+                    print("AI: ", end='')
                     for chunk in response:
                         chunkText = chunk.text
+                        print(chunkText, end='')
                         result = ""
                         i = 0
                         
@@ -921,7 +924,6 @@ if __name__ == "__main__":
                 analyzeThread.join()
                 
                 responseText = response.text
-                print(f"AI: {responseText}")
                 
                 pythoncode = gemini_ai.extract_code(responseText)
 
