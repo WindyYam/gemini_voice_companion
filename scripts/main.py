@@ -830,12 +830,10 @@ if __name__ == "__main__":
 
         def speak_thread():
             while True:
-                if mSpeakQueue.qsize() > 0:
-                    text = ''
-                    while(not (mSpeakQueue.qsize() == 0)):
-                        text += mSpeakQueue.get()
-                else:
-                    text = mSpeakQueue.get()
+                # block at first, then empty the queue
+                text = mSpeakQueue.get()
+                while(mSpeakQueue.qsize() > 0):
+                    text += mSpeakQueue.get()
                 with wdt_feed_lock2:
                     text_to_speech.speak(text)
 
