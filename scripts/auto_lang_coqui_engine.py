@@ -701,10 +701,13 @@ class AutoLangCoquiEngine(BaseEngine):
         """
         if not isinstance(voice, list):
             voice = [voice]        
-        self.send_command('update_reference', {'voice': voice})
+        
+        # lock
+        with self._synthesize_lock:
+            self.send_command('update_reference', {'voice': voice})
 
-        # Wait for the response from the worker process
-        status, result = self.parent_synthesize_pipe.recv()
+            # Wait for the response from the worker process
+            status, result = self.parent_synthesize_pipe.recv()
         if status == 'success':
             logging.info('Reference WAV updated successfully')
         else:
