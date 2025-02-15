@@ -47,7 +47,11 @@ if __name__ == "__main__":
     }
 
     pygame.init()
-    pygame.camera.init()
+    import platform
+    if platform.system() == 'Windows':
+        pygame.camera.init('_camera (MSMF)')
+    else:
+        pygame.camera.init()
     scheduler = sched.scheduler(time.time, time.sleep)
     alarm_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}alarm.mp3")
     code_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}code.mp3")
@@ -411,9 +415,11 @@ if __name__ == "__main__":
             load_value(err_msg)
 
     def event_thread():
+        clock = pygame.time.Clock()
+
         while True:
             try:
-                time.sleep(0.1)
+                clock.tick(10)
                 scheduler.run(blocking=False)
             except Exception as e:
                 print(e)
