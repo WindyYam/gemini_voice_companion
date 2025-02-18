@@ -1,10 +1,11 @@
-import RealtimeTTS
+import queue
 import os
 import wave
 import pygame
 import numpy as np
 import pyaudio
 from auto_lang_coqui_engine import AutoLangCoquiEngine
+from text_stream_to_stream import TextStreamToAudioStream
 class TextToSpeech:
     def __init__(self, voice_path, device_name = None):
         self.DEFAULT_VOICE = 'default'
@@ -15,6 +16,7 @@ class TextToSpeech:
         self.ROBOT_VOICE = 'robot'
         self.FEMALE_VOICE = 'female'
         self.voice_path = voice_path
+        self.mSpeakQueue = queue.Queue()
         self.eng = AutoLangCoquiEngine(   
             voice=self.DEFAULT_VOICE,
             specific_model='v2.0.3',
@@ -41,18 +43,27 @@ class TextToSpeech:
             print('Setting Speaker: ', audio.get_device_info_by_host_api_device_index(0, device_index).get('name'))
         else:
             print('Setting Speaker: ', audio.get_default_output_device_info().get('name'))
-        self.stream = RealtimeTTS.TextToAudioStream(self.eng, output_device_index=device_index)
+        self.stream = TextStreamToAudioStream(self.eng, output_device_index=device_index)
         
         self.vader_breath = pygame.mixer.Sound(f"{voice_path}breathing.mp3")
         self.vader_breath.set_volume(0.1)
 
-    def stop(self):
-        self.stream.stop()
+        def iterator():
+            while True:
+                chunk = self.mSpeakQueue.get()  # Blocks if queue is empty
+                yield chunk  # Yield the next chunk
+        self.stream.play_async(external_text_iterator = iterator(), sentence_fragment_delimiters = ".?!;\n…))]}。？")
 
-    def speak(self, text:str):
+    def stop(self):
+        with self.mSpeakQueue.mutex:
+            self.mSpeakQueue.queue.clear()
+        self.stream.stop()
+        #self.stream.stop()
+
+    def feed(self, text:str):
+        self.stream.check_player()
         text = text.replace('*', ' ')
-        self.stream.feed(text)
-        self.stream.play(sentence_fragment_delimiters = ".?!;,\n…{[())]}。-？，")
+        self.mSpeakQueue.put(text)
 
     def switch_user_voice(self, audio):
         self.vader_breath.stop()

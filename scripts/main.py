@@ -477,7 +477,7 @@ if __name__ == "__main__":
         alarm_sound.play(2)
     
     def play_text_voice(text:str):
-        mSpeakQueue.put(text)
+        text_to_speech.feed(text)
 
     def freetalk_mode(on:bool):
         previous = context['freetalk']
@@ -540,7 +540,7 @@ if __name__ == "__main__":
         delete_memory_sound.play()
 
     def main():
-        global context, gemini_ai, voice_recognition, text_to_speech, cam, mInputQueue, mSpeakQueue, gemini_ai
+        global context, gemini_ai, voice_recognition, text_to_speech, cam, mInputQueue, gemini_ai
 
         from json import JSONEncoder
         # for gemini file serialization
@@ -551,7 +551,6 @@ if __name__ == "__main__":
         JSONEncoder.default = _default
 
         mInputQueue = queue.Queue()
-        mSpeakQueue = queue.Queue()
 
         # Initialize camera
         camlist = pygame.camera.list_cameras()
@@ -592,7 +591,7 @@ if __name__ == "__main__":
                         talk_header[0]['parts'][0] = function_file
                 except Exception as e:
                     print(e)
-                    mSpeakQueue('Hmm, looks like some connection issues out there.')
+                    text_to_speech.feed('Hmm, looks like some connection issues out there.')
 
         def check_history_files():
             for item in context['talk']:
@@ -834,27 +833,16 @@ if __name__ == "__main__":
                         ApplicationWatchdog.Feed()
                 time.sleep(CHECK_INTERVAL)
 
-        def speak_thread():
-            while True:
-                # block at first, then empty the queue
-                text = mSpeakQueue.get()
-                while(mSpeakQueue.qsize() > 0):
-                    text += mSpeakQueue.get()
-                with wdt_feed_lock2:
-                    text_to_speech.speak(text)
-
-
         load_history()
         load_memory()
 
         threading.Thread(target=input_thread).start()
         threading.Thread(target=voice_thread).start()
         threading.Thread(target=wdt_feed_thread).start()
-        threading.Thread(target=speak_thread).start()
         
         # Main loop
         start_up_sound.play()
-        mSpeakQueue.put(f"{config['ai_name']}, online. How can I help you?")
+        text_to_speech.feed(f"{config['ai_name']}, online. How can I help you?")
         append2log('==================New=====================')
         check_function_file()
 
@@ -894,10 +882,6 @@ if __name__ == "__main__":
                     print(f'(Exception: {e})')
                 
                 # Stop speaking
-                with mSpeakQueue.mutex:
-                    mSpeakQueue.queue.clear()
-                    mSpeakQueue.all_tasks_done.notify_all()
-                    mSpeakQueue.unfinished_tasks = 0
                 text_to_speech.stop()
 
                 def responseAnalyze(response):
@@ -921,7 +905,7 @@ if __name__ == "__main__":
                                     result += chunkText[i]
                                 i += 1
                         if result:  # Only yield non-empty results
-                            mSpeakQueue.put(result)
+                            text_to_speech.feed(result)
 
                 analyzeThread = threading.Thread(target=responseAnalyze, args=[response])
                 analyzeThread.start()
@@ -965,7 +949,7 @@ if __name__ == "__main__":
             except Exception as e:
                 print(e)
                 print('\a')
-                mSpeakQueue.put("Ops, some error happened.")
+                text_to_speech.feed("Ops, some error happened.")
                 exceptionCounter += 1
                 if exceptionCounter > 20:
                     with wdt_feed_lock2:

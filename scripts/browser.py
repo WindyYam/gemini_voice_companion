@@ -71,15 +71,19 @@ class Browser:
             
             # Wait for search results and click the first song
             first_result = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, '[data-testid="tracklist-row"]'))
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "[data-testid='top-result-card']"))
             )
             
-            # Find the play button within the first result
-            play_button = first_result.find_element(By.TAG_NAME, "button")
-            
-            # Move to the element and click it
             actions = ActionChains(self.driver)
-            actions.move_to_element(play_button).click().perform()
+            
+            actions.move_to_element(first_result).perform()
+            
+            button = WebDriverWait(self.driver, 10).until(
+                EC.visibility_of_any_elements_located((By.CSS_SELECTOR, "[data-testid='play-button']"))
+            )
+            
+            button[0].click()
+            
             
             print(f"Now playing: {song_name}")
             return True
