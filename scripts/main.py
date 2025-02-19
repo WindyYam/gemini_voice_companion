@@ -540,8 +540,9 @@ if __name__ == "__main__":
         delete_memory_sound.play()
 
     def main():
-        global context, gemini_ai, voice_recognition, text_to_speech, cam, mInputQueue, gemini_ai
+        global context, gemini_ai, voice_recognition, text_to_speech, cam, mInputQueue, gemini_ai, text_to_speech, voice_recognition
 
+        init_list = []
         from json import JSONEncoder
         # for gemini file serialization
         def _default(self, obj):
@@ -571,8 +572,6 @@ if __name__ == "__main__":
             {'role': 'user', 'parts': [None, 'This is the list of python APIs you can execute. To execute them, put them in python code snippet at the end of your response. Now start a new conversation.', '']},
             {'role': 'model', 'parts': ['''Alright, I'm ready to execute some Python code! Starting a fresh new talk!\n```python\nstart_new_conversation("""We had some fun talks over various topics.""")\n```''']}
         ]
-
-        gemini_ai = GeminiAI(model_name=config['model_name'], system_instruction=instruction)
 
         def check_function_file():
             needUpload = False
@@ -614,11 +613,27 @@ if __name__ == "__main__":
                 else:
                     recorder.start_recording('camera')
 
-        text_to_speech = TextToSpeech(SOUNDS_PATH, device_name=config['speaker_device'])
-        voice_recognition = VoiceRecognition(on_recording_start=on_record_start, device_name=config['recorder_device'])
-        voice_recognition.recorder.set_recording_judger(lambda: not text_to_speech.stream.is_still_playing())
-        if not config['allow_record_during_speaking']:
-            voice_recognition.recorder.set_use_record_judger_for_recording(True)
+        def gemini_start():
+            global gemini_ai
+            gemini_ai = GeminiAI(model_name=config['model_name'], system_instruction=instruction)
+        gemini_ai_startup = threading.Thread(target=gemini_start)
+        gemini_ai_startup.start()
+        init_list.append(gemini_ai_startup)
+
+        def text_to_speech_start():
+            global text_to_speech
+            text_to_speech = TextToSpeech(SOUNDS_PATH, device_name=config['speaker_device'])
+        text_to_speech_startup = threading.Thread(target=text_to_speech_start)
+        text_to_speech_startup.start()
+        init_list.append(text_to_speech_startup)
+        
+        def voice_recognition_start():
+            global voice_recognition
+            voice_recognition = VoiceRecognition(on_recording_start=on_record_start, device_name=config['recorder_device'])
+
+        voice_recognition_startup = threading.Thread(target=voice_recognition_start)
+        voice_recognition_startup.start()
+        init_list.append(voice_recognition_startup)
 
         def trigger_button(e):
             evt_enter.set()
@@ -836,10 +851,20 @@ if __name__ == "__main__":
         load_history()
         load_memory()
 
+        # Wait for all init threads to finish
+        for thread in init_list:
+            thread.join()
+        init_list.clear()
+
+        if not config['allow_record_during_speaking']:
+            voice_recognition.recorder.set_recording_judger(lambda: not text_to_speech.stream.is_still_playing())
+            
         threading.Thread(target=input_thread).start()
         threading.Thread(target=voice_thread).start()
         threading.Thread(target=wdt_feed_thread).start()
         
+       
+
         # Main loop
         start_up_sound.play()
         text_to_speech.feed(f"{config['ai_name']}, online. How can I help you?")

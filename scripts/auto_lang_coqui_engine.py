@@ -1,4 +1,4 @@
-from RealtimeTTS import BaseEngine
+from RealtimeTTS import BaseEngine,CoquiEngine
 import torch.multiprocessing as mp
 from threading import Lock, Thread
 from typing import Union, List
@@ -15,7 +15,7 @@ import sys
 import io
 import os
 import re
-
+import threading
 
 TIME_SLEEP_DEVICE_RESET = 2
 
@@ -537,7 +537,9 @@ class AutoLangCoquiEngine(BaseEngine):
                     logging.info('Shutdown command received. Exiting worker process.')
                     conn.send(('shutdown', 'shutdown'))
                     break  # This exits the loop, effectively stopping the worker process.
-
+                
+                elif command == 'sync':
+                    conn.send(('synced', None))
                 elif command == 'synthesize':
                     def detect_language(text, english_threshold=0.5):
                         """
@@ -719,10 +721,11 @@ class AutoLangCoquiEngine(BaseEngine):
         """
         Sets the speed of the speech synthesis.
         """
-        self.send_command('set_speed', {'speed': speed})
+        with self._synthesize_lock:
+            self.send_command('set_speed', {'speed': speed})
 
-        # Wait for the response from the worker process
-        status, result = self.parent_synthesize_pipe.recv()
+            # Wait for the response from the worker process
+            status, result = self.parent_synthesize_pipe.recv()
         if status == 'success':
             logging.info('Speed updated successfully')
         else:
@@ -823,9 +826,6 @@ class AutoLangCoquiEngine(BaseEngine):
 
             if len(text) < 1:
                 return
-            
-            while self.parent_synthesize_pipe.poll():  # Check if there's data available, clear pending
-                self.parent_synthesize_pipe.recv()
                 
             data = {'text': text, 'language': self.language}
             self.send_command('synthesize', data)
@@ -842,6 +842,14 @@ class AutoLangCoquiEngine(BaseEngine):
                 status, result = self.parent_synthesize_pipe.recv()
 
             return True
+        
+    # mainly to clear the buffer queue for a new dialog
+    def sync(self):
+        with self._synthesize_lock:
+            self.send_command('sync', None)
+
+            _, _ = self.parent_synthesize_pipe.recv()
+        # if we received the response, means the echo command is processed, we are now synchronized with the remote process
 
     @staticmethod
     def download_file(url, destination):
@@ -949,19 +957,20 @@ class AutoLangCoquiEngine(BaseEngine):
         """
         # Send shutdown command to the worker process
         logging.info('Sending shutdown command to the worker process')
-        self.send_command('shutdown', {})
+        with self._synthesize_lock:
+            self.send_command('shutdown', {})
 
-        self.output_queue.put("STOP")
-        self.output_worker_thread.join()
+            self.output_queue.put("STOP")
+            self.output_worker_thread.join()
 
-        # Wait for the worker process to acknowledge the shutdown
-        try:
-            status, _ = self.parent_synthesize_pipe.recv()
-            if 'shutdown' in status:
-                logging.info('Worker process acknowledged shutdown')
-        except EOFError:
-            # Pipe was closed, meaning the process is already down
-            logging.warning('Worker process pipe was closed before shutdown acknowledgement')
+            # Wait for the worker process to acknowledge the shutdown
+            try:
+                status, _ = self.parent_synthesize_pipe.recv()
+                if 'shutdown' in status:
+                    logging.info('Worker process acknowledged shutdown')
+            except EOFError:
+                # Pipe was closed, meaning the process is already down
+                logging.warning('Worker process pipe was closed before shutdown acknowledgement')
 
         # Close the pipe connection
         self.parent_synthesize_pipe.close()

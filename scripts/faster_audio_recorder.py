@@ -27,8 +27,6 @@ class FasterAudioRecorder(AudioToTextRecorder):
             self.transcribe_count = 0
         if not hasattr(self, "recording_judger"):
             self.recording_judger = lambda : True
-        if not hasattr(self, "use_record_judger_for_recording"):
-            self.use_record_judger_for_recording = False
         if not hasattr(self, "silero_off_sensitivity"):
             self.silero_off_sensitivity = self.silero_sensitivity
         try:
@@ -63,7 +61,7 @@ class FasterAudioRecorder(AudioToTextRecorder):
                     print("BrokenPipeError _recording_worker")
                     self.is_running = False
                     break
-                if self.use_record_judger_for_recording and not self.recording_judger():
+                if not self.recording_judger():
                     # if we want to skip the frame when it is speaking
                     data=bytes(len(data))
                 if not self.is_recording:
@@ -263,9 +261,6 @@ class FasterAudioRecorder(AudioToTextRecorder):
     #For dynamic judgement of fast transcribe during recording. since I don't want it to transcribe when the AI is speaking at the same time, which can cause performance issue on my PC
     def set_recording_judger(self, judger):
         self.recording_judger = judger
-
-    def set_use_record_judger_for_recording(self, on):
-        self.use_record_judger_for_recording = on
 
     def set_silero_off_sensitivity(self, off_sens):
         self.silero_off_sensitivity = off_sens
