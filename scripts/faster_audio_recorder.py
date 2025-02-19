@@ -64,6 +64,7 @@ class FasterAudioRecorder(AudioToTextRecorder):
                 allow_record = self.recording_judger()
                 if not allow_record:
                     self.is_recording = False
+                    self.start_recording_on_voice_activity = True
                     self.frames.clear()
                     continue
 
