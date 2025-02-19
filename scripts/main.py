@@ -616,7 +616,7 @@ if __name__ == "__main__":
 
         text_to_speech = TextToSpeech(SOUNDS_PATH, device_name=config['speaker_device'])
         voice_recognition = VoiceRecognition(on_recording_start=on_record_start, device_name=config['recorder_device'])
-        voice_recognition.recorder.set_recording_judger(lambda: not text_to_speech.stream.is_playing())
+        voice_recognition.recorder.set_recording_judger(lambda: not text_to_speech.stream.is_still_playing())
         if not config['allow_record_during_speaking']:
             voice_recognition.recorder.set_use_record_judger_for_recording(True)
 
