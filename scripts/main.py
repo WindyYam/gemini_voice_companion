@@ -585,9 +585,8 @@ if __name__ == "__main__":
 
             if needUpload:
                 try:
-                    if not talk_header[0]['parts'][0]:
-                        function_file = gemini_ai.upload_file(path="api_list.txt", display_name="Python API")
-                        talk_header[0]['parts'][0] = function_file
+                    function_file = gemini_ai.upload_file(path="api_list.txt", display_name="Python API")
+                    talk_header[0]['parts'][0] = function_file
                 except Exception as e:
                     print(e)
                     text_to_speech.feed('Hmm, looks like some connection issues out there.')
@@ -909,14 +908,17 @@ if __name__ == "__main__":
                 # Stop speaking
                 text_to_speech.stop()
 
-                def responseAnalyze(response):
+                def responseAnalyzeAndSpeak(response):
                     # need to filter out ```` code blocks
                     inside_block = False
 
                     print("AI: ", end='')
+
+                    responseText = ''
                     for chunk in response:
                         chunkText = chunk.text
                         print(chunkText, end='')
+                        responseText += chunkText
                         result = ""
                         i = 0
                         
@@ -931,10 +933,17 @@ if __name__ == "__main__":
                                 i += 1
                         if result:  # Only yield non-empty results
                             text_to_speech.feed(result)
+                    
+                    return responseText
 
-                responseAnalyze(response)
-                
-                responseText = response.text
+                if response is str:
+                    responseText = response
+                else:
+                    try:
+                        responseText = responseAnalyzeAndSpeak(response)
+                    except Exception as e:
+                        print(e)
+                        text_to_speech.feed("Oops, error during generating response.")
                 
                 pythoncode = gemini_ai.extract_code(responseText)
 
@@ -972,7 +981,7 @@ if __name__ == "__main__":
             except Exception as e:
                 print(e)
                 print('\a')
-                text_to_speech.feed("Ops, some error happened.")
+                text_to_speech.feed("Oops, some error happened.")
                 exceptionCounter += 1
                 if exceptionCounter > 20:
                     with wdt_feed_lock2:

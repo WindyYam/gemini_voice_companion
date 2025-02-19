@@ -22,19 +22,34 @@ setFanSpeed(speed:int)
 getHouseStatus()->str
 
 ##########################################################
-# You can get the real world information by web searching and reading
+# You can get the real world information using these APIs
 # The following are the APIs for searching and reading through the web
+# To read information you must always use load_value(str) on the returned info
 ##########################################################
 # get the current city name
 getCity()->str
 
-# online search for any information from web search engine, e.g. news, weather, which returns several links and brief descriptions. Always use function load_value(result) on the returned result to analyze the result.
-# after the search, always get more detail by get_webpage_text() call to the most relative link from the search result. To get multiple web contents in one go, combine the text into a dict and then call load_value(dict)
+# online search for any information from web search engine, e.g. news, weather, which returns several links and brief descriptions. 
+# typical usage: load_value(webSearch(query))
+# after the search, always get more detail by get_webpage_text() call to the most relative link from the search result. 
+# to get multiple web contents in one go, combine the text into a dict and then call load_value(dict)
 # after getting detail, summarize the highlights from all the gathered information in a short concise way.
 webSearch(query:str)->str
 
-# get webpage content text. always call this to get the detail on the most relevant link after web search. Always use function load_value(text) on the returned text to analyze the result.
+# get webpage content text. always call this to get the detail on the most relevant link after web search. 
+# typical usage: load_value(get_webpage_text(url)) or load_value(['webA':get_webpage_text(urlA), 'webB':get_webpage_text(urlB)])
 get_webpage_text(url:str)->str
+
+# take a photo through the camera. this return the photo image. 
+# typical usage: load_value(camera_shot())
+camera_shot() -> str
+
+# take the screenshot of the PC you are running on, return the photo image. 
+# typical usage: load_value(screenshot())
+screenshot() -> str
+
+# get text content from PC's clipboard
+get_clipboard_text() -> str
 
 ##########################################################
 # Python library access you have
@@ -56,9 +71,6 @@ load_value(value)
 
 # turning on/off vision mode so it will attach a photo on every request to you as your vision, arg on is True/False, type can be 'camera' or 'screenshot' to indicate image source. When vision mode is set on, you don't need load_value() for the photo
 vision_mode(on, type)
-
-# take a photo through the camera. this return the photo image. Always put load_value(photo_image) in the code snippet to analyze photo.
-camera_shot() -> str
 
 # switch voice system to user voice to mimic the user's voice tone only, and your personality keeps unchanged.
 switch_user_voice()
@@ -125,16 +137,10 @@ freetalk_mode(on:bool)
 # call this to summarize our talk history, and start a new conversation with the summary. you should generate the detailed summary of all our talk history as argument, and always use raw triple quotes """ for the text.
 start_new_conversation(summary:str)
 
-# take the screenshot of the PC you are running on, return the photo image. Always put load_value(photo_image) in the code snippet to analyze the photo.
-screenshot() -> str
-
 # type in the text using keyboard API into the PC. Always use raw triple quotes """ for the text.
 keyboard_type_text(text: str)
 
-# get text content from PC's clipboard
-get_clipboard_text() -> str
-
-# get the log file of today's conversation, access it when I ask you to write diary
+# get the log file of today's conversation, access it when I ask you to write diary. Use load_value() to read it.
 get_today_conversation() -> str
 
 # enter sleep for the voice module. calling your name will wake that module up

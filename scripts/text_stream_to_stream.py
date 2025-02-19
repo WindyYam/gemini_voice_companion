@@ -279,7 +279,10 @@ class TextStreamToAudioStream(TextToAudioStream):
 
     def is_still_playing(self):
         playing = not self.player.buffer_manager.audio_buffer.empty()
-        if self.sentence_queue:
+        # in rare case sentence_queue is not created yet
+        try:
             playing = playing or self.sentence_queue._qsize() > 0
+        finally:
+            pass
         return playing
 
