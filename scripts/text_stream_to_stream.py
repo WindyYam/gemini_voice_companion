@@ -282,6 +282,8 @@ class TextStreamToAudioStream(TextToAudioStream):
         # in rare case sentence_queue is not created yet
         try:
             playing = playing or self.sentence_queue._qsize() > 0
+        except:
+            pass
         finally:
             pass
         return playing
