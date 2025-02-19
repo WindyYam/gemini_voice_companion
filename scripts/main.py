@@ -46,12 +46,12 @@ if __name__ == "__main__":
         'vision_mode_camrea_is_screen' : False    # This will work with Discord video call to capture the video screen as the AI's vision, in this case you are on the other end of discord chat holding the phone camera
     }
 
-    pygame.init()
     import platform
     if platform.system() == 'Windows':
         pygame.camera.init('_camera (MSMF)')
     else:
         pygame.camera.init()
+    pygame.mixer.init()
     scheduler = sched.scheduler(time.time, time.sleep)
     alarm_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}alarm.mp3")
     code_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}code.mp3")
