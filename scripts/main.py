@@ -681,7 +681,7 @@ if __name__ == "__main__":
 
             if(len(user_lists) == 0):
                 print("Warning: No user voice sample registered! Run record_master_wave.py to register a user first!")
-                print(f"You can still talk by saying the AI name {config['ai_name']} in your phrase, or 'Nice to meet your'.")
+                print(f"You can still talk by saying the AI name {config['ai_name']} in your phrase, or 'Nice to meet you'.")
 
             exceptionCounter = 0
             while True:
