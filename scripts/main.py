@@ -932,9 +932,7 @@ if __name__ == "__main__":
                         if result:  # Only yield non-empty results
                             text_to_speech.feed(result)
 
-                analyzeThread = threading.Thread(target=responseAnalyze, args=[response])
-                analyzeThread.start()
-                analyzeThread.join()
+                responseAnalyze(response)
                 
                 responseText = response.text
                 
