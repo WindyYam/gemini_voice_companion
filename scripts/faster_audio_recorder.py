@@ -61,9 +61,12 @@ class FasterAudioRecorder(AudioToTextRecorder):
                     print("BrokenPipeError _recording_worker")
                     self.is_running = False
                     break
-                if not self.recording_judger():
-                    # if we want to skip the frame when it is speaking
-                    data=bytes(len(data))
+                allow_record = self.recording_judger()
+                if not allow_record:
+                    self.is_recording = False
+                    self.frames.clear()
+                    continue
+
                 if not self.is_recording:
                     # Handle not recording state
                     time_since_listen_start = (time.time() - self.listen_start
@@ -170,7 +173,7 @@ class FasterAudioRecorder(AudioToTextRecorder):
                             # measuring silence time before stopping recording
                             if self.speech_end_silence_start == 0:
                                 self.speech_end_silence_start = time.time()
-                                if self.recording_judger() and (len(self.frames) > 0):
+                                if  (len(self.frames) > 0):
                                     # remove pending
                                     while self.parent_transcription_pipe.poll():
                                         status, result = self.parent_transcription_pipe.recv()
