@@ -71,56 +71,42 @@ class FasterAudioRecorder(AudioToTextRecorder):
                 if not self.is_recording:
                     # Check for voice activity to
                     # trigger the start of recording
-                    if (self.start_recording_on_voice_activity):
 
-                        if self._is_silero_speech(data[:]):
-                            logging.info("voice activity detected")
+                    if self._is_silero_speech(data[:]):
+                        logging.info("voice activity detected")
 
-                            self.start()
-                        else:
-                            pass
+                        self.start()
+                    else:
+                        pass
 
                     self.speech_end_silence_start = 0
 
                 else:
                     # If we are currently recording
+                    if self._is_not_silero_speech(data[:]):
+                        # Voice deactivity was detected, so we start
+                        # measuring silence time before stopping recording
+                        if self.speech_end_silence_start == 0:
+                            self.speech_end_silence_start = time.time()
+                            if  (len(self.frames) > 0):
+                                # remove pending
+                                while self.parent_transcription_pipe.poll():
+                                    status, result = self.parent_transcription_pipe.recv()
+                                    self.transcribe_count -= 1
+                                audio_array = np.frombuffer(b''.join(self.frames), dtype=np.int16)
+                                audio = audio_array.astype(np.float32) / INT16_MAX_ABS_VALUE
+                                self.parent_transcription_pipe.send((audio, self.language))
+                                self.transcribe_count += 1
 
-                    # Stop the recording if silence is detected after speech
-                    if self.stop_recording_on_voice_deactivity:
+                    else:
+                        self.speech_end_silence_start = 0
 
-                        if self._is_not_silero_speech(data[:]):
-                            # Voice deactivity was detected, so we start
-                            # measuring silence time before stopping recording
-                            if self.speech_end_silence_start == 0:
-                                self.speech_end_silence_start = time.time()
-                                if  (len(self.frames) > 0):
-                                    # remove pending
-                                    while self.parent_transcription_pipe.poll():
-                                        status, result = self.parent_transcription_pipe.recv()
-                                        self.transcribe_count -= 1
-                                    audio_array = np.frombuffer(b''.join(self.frames), dtype=np.int16)
-                                    audio = audio_array.astype(np.float32) / INT16_MAX_ABS_VALUE
-                                    self.parent_transcription_pipe.send((audio, self.language))
-                                    self.transcribe_count += 1
-
-                        else:
-                            self.speech_end_silence_start = 0
-
-                        # Wait for silence to stop recording after speech
-                        if self.speech_end_silence_start and time.time() - \
-                                self.speech_end_silence_start > \
-                                self.post_speech_silence_duration:
-                            logging.info("voice deactivity detected")
-                            self.stop()
-
-                if not self.is_recording and was_recording:
-                    # Reset after stopping recording to ensure clean state
-                    self.stop_recording_on_voice_deactivity = False
-
-                if time.time() - self.silero_check_time > 0.1:
-                    self.silero_check_time = 0
-
-                was_recording = self.is_recording
+                    # Wait for silence to stop recording after speech
+                    if self.speech_end_silence_start and time.time() - \
+                            self.speech_end_silence_start > \
+                            self.post_speech_silence_duration:
+                        logging.info("voice deactivity detected")
+                        self.stop()
 
                 if self.is_recording:
                     self.frames.append(data)
