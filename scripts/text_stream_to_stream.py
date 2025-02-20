@@ -276,6 +276,7 @@ class TextStreamToAudioStream(TextToAudioStream):
         self.engine.sync()
         with self.engine.queue.mutex:
             self.engine.queue.queue.clear()
+        self.player.buffer_manager.clear_buffer()
 
     def is_still_playing(self):
         playing = not self.player.buffer_manager.audio_buffer.empty()

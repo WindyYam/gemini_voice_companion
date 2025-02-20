@@ -69,97 +69,16 @@ class FasterAudioRecorder(AudioToTextRecorder):
                     continue
 
                 if not self.is_recording:
-                    # Handle not recording state
-                    time_since_listen_start = (time.time() - self.listen_start
-                                               if self.listen_start else 0)
-
-                    wake_word_activation_delay_passed = (
-                        time_since_listen_start >
-                        self.wake_word_activation_delay
-                    )
-
-                    # Handle wake-word timeout callback
-                    if wake_word_activation_delay_passed \
-                            and not delay_was_passed:
-
-                        if self.use_wake_words and self.wake_word_activation_delay:
-                            if self.on_wakeword_timeout:
-                                self.on_wakeword_timeout()
-                    delay_was_passed = wake_word_activation_delay_passed
-
-                    # Set state and spinner text
-                    if not self.recording_stop_time:
-                        if self.use_wake_words \
-                                and wake_word_activation_delay_passed \
-                                and not self.wakeword_detected:
-                            self._set_state("wakeword")
-                        else:
-                            if self.listen_start:
-                                self._set_state("listening")
-                            else:
-                                self._set_state("inactive")
-
-                    #self.wake_word_detect_time = time.time()
-                    if self.use_wake_words and wake_word_activation_delay_passed:
-                        try:
-                            wakeword_index = self._process_wakeword(data)
-
-                        except struct.error:
-                            logging.error("Error unpacking audio data "
-                                          "for wake word processing.")
-                            continue
-
-                        except Exception as e:
-                            logging.error(f"Wake word processing error: {e}")
-                            continue
-
-                        # If a wake word is detected                        
-                        if wakeword_index >= 0:
-
-                            # Removing the wake word from the recording
-                            samples_time = int(self.sample_rate * self.wake_word_buffer_duration)
-                            start_index = max(
-                                0,
-                                len(self.audio_buffer) - samples_time
-                                )
-                            temp_samples = collections.deque(
-                                itertools.islice(
-                                    self.audio_buffer,
-                                    start_index,
-                                    None)
-                                )
-                            self.audio_buffer.clear()
-                            self.audio_buffer.extend(temp_samples)
-
-                            self.wake_word_detect_time = time.time()
-                            self.wakeword_detected = True
-                            #self.wake_word_cooldown_time = time.time()
-                            if self.on_wakeword_detected:
-                                self.on_wakeword_detected()
-
                     # Check for voice activity to
                     # trigger the start of recording
-                    if ((not self.use_wake_words
-                         or not wake_word_activation_delay_passed)
-                            and self.start_recording_on_voice_activity) \
-                            or self.wakeword_detected:
+                    if (self.start_recording_on_voice_activity):
 
                         if self._is_silero_speech(data[:]):
                             logging.info("voice activity detected")
 
                             self.start()
-
-                            if self.is_recording:
-                                self.start_recording_on_voice_activity = False
-
-                                # Add the buffered audio
-                                # to the recording frames
-                                self.frames.extend(list(self.audio_buffer))
-                                self.audio_buffer.clear()
                         else:
                             pass
-                            #data_copy = data[:]
-                            #self._check_voice_activity(data_copy)
 
                     self.speech_end_silence_start = 0
 
@@ -201,23 +120,10 @@ class FasterAudioRecorder(AudioToTextRecorder):
                 if time.time() - self.silero_check_time > 0.1:
                     self.silero_check_time = 0
 
-                # Handle wake word timeout (waited to long initiating
-                # speech after wake word detection)
-                if self.wake_word_detect_time and time.time() - \
-                        self.wake_word_detect_time > self.wake_word_timeout:
-
-                    self.wake_word_detect_time = 0
-                    if self.wakeword_detected and self.on_wakeword_timeout:
-                        self.on_wakeword_timeout()
-                    self.wakeword_detected = False
-
                 was_recording = self.is_recording
 
                 if self.is_recording:
                     self.frames.append(data)
-
-                if not self.is_recording or self.speech_end_silence_start:
-                    self.audio_buffer.append(data)
 
         except Exception as e:
             if not self.interrupt_stop_event.is_set():
