@@ -907,18 +907,17 @@ if __name__ == "__main__":
                 
                 # Stop speaking
                 text_to_speech.stop()
-
+                responseTextContainer = ['']
                 def responseAnalyzeAndSpeak(response):
                     # need to filter out ```` code blocks
                     inside_block = False
 
                     print("AI: ", end='')
 
-                    responseText = ''
                     for chunk in response:
                         chunkText = chunk.text
                         print(chunkText, end='')
-                        responseText += chunkText
+                        responseTextContainer[0] += chunkText
                         result = ""
                         i = 0
                         
@@ -933,17 +932,17 @@ if __name__ == "__main__":
                                 i += 1
                         if result:  # Only yield non-empty results
                             text_to_speech.feed(result)
-                    
-                    return responseText
 
                 if response is str:
                     responseText = response
                 else:
                     try:
-                        responseText = responseAnalyzeAndSpeak(response)
+                        responseAnalyzeAndSpeak(response)
                     except Exception as e:
                         print(e)
                         text_to_speech.feed("Oops, error during generating response.")
+                    finally:
+                        responseText = responseTextContainer[0]
                 
                 pythoncode = gemini_ai.extract_code(responseText)
 
