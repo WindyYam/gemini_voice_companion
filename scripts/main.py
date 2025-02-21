@@ -764,7 +764,7 @@ if __name__ == "__main__":
                                     closest_similarity = user_similarity
                                     closest_user = item['user']
 
-                            if (closest_similarity > verify_threshold) and (not text_to_speech.stream.is_playing() or  (text_to_speech.stream.is_playing() and len(voice_recognition.recorder.audio) > voice_recognition.recorder.sample_rate * 2)):    # Only transcribe sentence which is > 2 seconds long when it is talking, ignore small fragments
+                            if (closest_similarity > verify_threshold) and (not text_to_speech.stream.is_still_playing() or  (text_to_speech.stream.is_still_playing() and len(voice_recognition.recorder.audio) > voice_recognition.recorder.sample_rate * 2)):    # Only transcribe sentence which is > 2 seconds long when it is talking, ignore small fragments
                                 if not temp_text:
                                     with wdt_feed_lock1:
                                         temp_text = voice_recognition.transcribe_voice()
@@ -773,7 +773,7 @@ if __name__ == "__main__":
                                 voice_off_sound.play()
                             else:
                                 # do the AI_NAME match only when it is not talking and record length > 2sec, as this consumes GPU resource
-                                if not text_to_speech.stream.is_playing() and len(voice_recognition.recorder.audio) > voice_recognition.recorder.sample_rate * 2:
+                                if not text_to_speech.stream.is_still_playing() and len(voice_recognition.recorder.audio) > voice_recognition.recorder.sample_rate * 2:
                                     if not temp_text:
                                         with wdt_feed_lock1:
                                             temp_text = voice_recognition.transcribe_voice()
