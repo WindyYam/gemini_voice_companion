@@ -213,12 +213,16 @@ def play_prev_music():
 def locate_in_map():
     check_browser()
     player.locate_in_map()
-    return player.snapshot_map()
+    return player.snapshot()
 
 def search_in_map(query):
     check_browser()
     player.search_map(query)
-    return player.snapshot_map()
+    return player.snapshot()
+
+def snapshot_browser():
+    check_browser()
+    return player.snapshot()
 
 def keyboard_type_text(text: str):
     import keyboard

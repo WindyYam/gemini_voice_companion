@@ -79,8 +79,8 @@ if __name__ == "__main__":
     power_on_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}poweron.mp3")
     today = str(date.today())
     evt_enter = threading.Event()
-    wdt_feed_lock1 = threading.Lock()
-    wdt_feed_lock2 = threading.Lock()
+    wdt_feed_transcribe = threading.Lock()
+    wdt_feed_synthesize = threading.Lock()
 
     # Create the folder if it doesn't exist
     os.makedirs(TEMP_PATH, exist_ok=True)
@@ -112,7 +112,8 @@ if __name__ == "__main__":
             'recorder_device': RECORDER_DEVICE,
             'speaker_device': SPEAKER_DEVICE,
             'voice_similarity_threshold': 0.72,
-            'allow_record_during_speaking' : True
+            'allow_record_during_speaking' : True,
+            'dynamic_update_user_embedding': True
         }
         try:
             with open(CONFIG_FILE, 'r') as f:
@@ -700,7 +701,7 @@ if __name__ == "__main__":
                         # In case change in the middle
                         if not context['freetalk']:
                             voice_on_sound.play()
-                            with wdt_feed_lock1:
+                            with wdt_feed_transcribe:
                                 voice_recognition.start_listen()
 
                                 evt_enter.wait()
@@ -744,7 +745,7 @@ if __name__ == "__main__":
                         if context['sleep']:
                             # It is sleeping, we detect if the name appears in the text to exit sleep
                             if not temp_text:
-                                with wdt_feed_lock1:
+                                with wdt_feed_transcribe:
                                     temp_text = voice_recognition.transcribe_voice()
                                 print('Sleeping:', temp_text)
                             if config['ai_name'] in temp_text:
@@ -757,25 +758,31 @@ if __name__ == "__main__":
 
                             closest_similarity = 0
                             closest_user = None
+                            closest_item = {}
                             for item in user_lists:
                                 user_similarity = voice_recognition.verify_speaker(item['embedding'], voice_embed)
                                 print(f"{item['user']} similarity:", user_similarity)
                                 if user_similarity > closest_similarity:
                                     closest_similarity = user_similarity
                                     closest_user = item['user']
+                                    closest_item = item
 
                             if (closest_similarity > verify_threshold) and (not text_to_speech.stream.is_still_playing() or  (text_to_speech.stream.is_still_playing() and len(voice_recognition.recorder.audio) > voice_recognition.recorder.sample_rate * 2)):    # Only transcribe sentence which is > 2 seconds long when it is talking, ignore small fragments
                                 if not temp_text:
-                                    with wdt_feed_lock1:
+                                    with wdt_feed_transcribe:
                                         temp_text = voice_recognition.transcribe_voice()
 
                                 text = f'**{closest_user}:**{temp_text}'
                                 voice_off_sound.play()
+                                # let's update user embedding if voice length is > 2 sec
+                                if config['dynamic_update_user_embedding'] and len(voice_recognition.recorder.audio) > voice_recognition.recorder.sample_rate * 2:
+                                    print(f"Update user {closest_user}")
+                                    closest_item['embedding'] = voice_embed
                             else:
                                 # do the AI_NAME match only when it is not talking and record length > 2sec, as this consumes GPU resource
                                 if not text_to_speech.stream.is_still_playing() and len(voice_recognition.recorder.audio) > voice_recognition.recorder.sample_rate * 2:
                                     if not temp_text:
-                                        with wdt_feed_lock1:
+                                        with wdt_feed_transcribe:
                                             temp_text = voice_recognition.transcribe_voice()
                                     print(temp_text)
                                     if (config['ai_name'] in temp_text) or ('to meet you' in temp_text):
@@ -790,7 +797,7 @@ if __name__ == "__main__":
                                     print('guest similarity:', guest_similarity)
                                     if guest_similarity > verify_threshold:
                                         if not temp_text:
-                                            with wdt_feed_lock1:
+                                            with wdt_feed_transcribe:
                                                 temp_text = voice_recognition.transcribe_voice()
                                         text = f'**Guest:**{temp_text}'
                                         voice_off_sound.play()
@@ -835,15 +842,15 @@ if __name__ == "__main__":
                     exceptionCounter += 1
                     print(e)
                     if(exceptionCounter > 20):
-                        with wdt_feed_lock1:
+                        with wdt_feed_transcribe:
                             # wait for watchdog to restart
                             while True:
                                 pass
 
         def wdt_feed_thread():
             while True:
-                with wdt_feed_lock1:
-                    with wdt_feed_lock2:
+                with wdt_feed_transcribe:
+                    with wdt_feed_synthesize:
                         ApplicationWatchdog.Feed()
                 time.sleep(CHECK_INTERVAL)
 
@@ -884,7 +891,7 @@ if __name__ == "__main__":
                     text = mInputQueue.get()
                 if text == '':
                     continue
-
+                
                 parts = []
                 if context['upload_file']:
                     gemini_ai.wait_file(context['upload_file'])
@@ -906,7 +913,8 @@ if __name__ == "__main__":
                     print(f'(Exception: {e})')
                 
                 # Stop speaking
-                text_to_speech.stop()
+                with wdt_feed_synthesize:
+                    text_to_speech.stop()
                 responseTextContainer = ['']
                 def responseAnalyzeAndSpeak(response):
                     # need to filter out ```` code blocks
@@ -943,7 +951,8 @@ if __name__ == "__main__":
                         text_to_speech.feed("Oops, error during generating response.")
                     finally:
                         responseText = responseTextContainer[0]
-                
+                if(responseText == ''):
+                    responseText = "(Well, looks like something wrong.)"
                 pythoncode = gemini_ai.extract_code(responseText)
 
                 # Update context
@@ -983,7 +992,7 @@ if __name__ == "__main__":
                 text_to_speech.feed("Oops, some error happened.")
                 exceptionCounter += 1
                 if exceptionCounter > 20:
-                    with wdt_feed_lock2:
+                    with wdt_feed_synthesize:
                         #wait for watchdog to restart
                         while True:
                             pass

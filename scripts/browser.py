@@ -133,7 +133,7 @@ class Browser:
         
         time.sleep(2)
 
-    def snapshot_map(self):
+    def snapshot(self):
         # Take screenshot and save as PNG in memory
         png_data = self.driver.get_screenshot_as_png()
         

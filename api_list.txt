@@ -34,6 +34,7 @@ getCity()->str
 # after the search, always get more detail by get_webpage_text() call to the most relative link from the search result. 
 # to get multiple web contents in one go, combine the text into a dict and then call load_value(dict)
 # after getting detail, summarize the highlights from all the gathered information in a short concise way.
+# if it returns empty result, it is high likely the user need to solve the CAPTCHA in duckduckgo.
 webSearch(query:str)->str
 
 # get webpage content text. always call this to get the detail on the most relevant link after web search. 
@@ -127,6 +128,9 @@ navigate_to(url:str)
 
 # locate the user in the google map, return the map image. Call the image with load_value() to get it
 locate_in_map() -> str
+
+# get a snapshot image from the browser
+snapshot_browser() -> str
 
 # search for query in the google map nearby, return the map image. Call the image with load_value() to get it
 search_in_map(query) -> str
