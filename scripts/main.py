@@ -112,8 +112,8 @@ if __name__ == "__main__":
             'recorder_device': RECORDER_DEVICE,
             'speaker_device': SPEAKER_DEVICE,
             'voice_similarity_threshold': 0.72,
-            'allow_record_during_speaking' : True,
-            'dynamic_update_user_embedding': True
+            'allow_record_during_speaking' : False,
+            'dynamic_update_user_embedding': False
         }
         try:
             with open(CONFIG_FILE, 'r') as f:

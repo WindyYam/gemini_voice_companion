@@ -1,6 +1,6 @@
 {
   "ai_name": "Jarvis",
-  "model_name": "gemini-2.0-flash-lite",
+  "model_name": "gemini-2.0-flash",
   "user_chrome_data_path": "C:\\Users\\Zhenya\\AppData\\Local\\Google\\Chrome\\User Data",
   "max_history": 20,
   "max_memory": 10,
@@ -8,6 +8,6 @@
   "recorder_device": null,
   "speaker_device": null,
   "voice_similarity_threshold": 0.72,
-  "allow_record_during_speaking": true,
+  "allow_record_during_speaking": false,
   "dynamic_update_user_embedding": true
 }
