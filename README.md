@@ -54,6 +54,7 @@ Make sure your nVidia graphic card is in latest driver.
 Download this repo and put all the content into a folder.  
 Then first, install Python 3.12 from https://www.python.org/downloads/ (might work with other version but not tested).  
 After that, simply run `setup.bat` to install all dependencies.  
+Added: You might also need to install cuDNN for some libraries if you encounter ops64_9.dll issue. https://developer.nvidia.com/cudnn-downloads. And don't forget to add the environment PATH `C:\Program Files\NVIDIA\CUDNN\v9.8\bin\12.8`
 
 ## Usage
 
