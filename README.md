@@ -62,7 +62,7 @@ Added: You might also need to install cuDNN for some libraries if you encounter 
   (recommended) put it in environment variable as GEMINI_API_KEY (please search for detail on how to add environment variable if you are not familiar with). Or  
   (not recommended) do nothing, and `run.bat` will prompt you to enter GEMINI_API_KEY at the beginning every time.
 2. Run `manage_user.bat` to add/delete user voice for AI to recognize. You can add multiple users.
-3. Use any text editor to open and configure through `config.json` for several parameters. You should modify `user_chrome_data_path` to point to your chrome user profile(Which has Spotify logged in). Typically just replace "Zhenya" with your Google account name, or you can explore in your PC to the same folder structure to find out.
+3. Use any text editor to open and configure through `config.json` for several parameters. You should modify `user_chrome_data_path` to point to your chrome user profile. You can't use default profile for this, either copy your chrome user profile to somewhere like `C:/YourCustomProfileFolder/MyProfile`, or use command: `PATH_TO_YOUR_CHROME/chrome.exe --user-data-dir="C:/YourCustomProfileFolder/MyProfile" --profile-directory="Default"` to create a new one. Then copy the path `C:/YourCustomProfileFolder/MyProfile` to replace the existing in `user_chrome_data_path`.
 4. Run `run.bat`. Make sure you've GEMINI_API_KEY variable in step 1.
 5. When using Chrome related features(such as playing spotify music, navigate webpage), make sure you have Google Chrome installed, Spotify logged in, and Chrome is closed before doing AI Chrome features.
 

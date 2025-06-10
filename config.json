@@ -1,7 +1,7 @@
 {
   "ai_name": "Jarvis",
-  "model_name": "gemini-2.0-flash",
-  "user_chrome_data_path": "C:\\Users\\Zhenya\\AppData\\Local\\Google\\Chrome\\User Data",
+  "model_name": "gemini-2.0-flash-lite",
+  "user_chrome_data_path": "C:\\MySource\\gemini_voice_companion\\Chrome_User_Data",
   "max_history": 20,
   "max_memory": 10,
   "target_camera": "DroidCam Video",

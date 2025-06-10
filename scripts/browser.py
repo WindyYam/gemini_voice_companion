@@ -15,27 +15,37 @@ import platform
 class Browser:
     def __init__(self, user_data_dir, profile_directory, temp_dir='temp/'):
         self.chrome_options = webdriver.ChromeOptions()
+
         self.chrome_options.add_argument(f"user-data-dir={user_data_dir}")
         self.chrome_options.add_argument(f"profile-directory={profile_directory}")
         self.chrome_options.add_argument("disable-features=HardwareMediaKeyHandling")
+        self.chrome_options.add_argument("--no-sandbox")
+        self.chrome_options.add_argument("--disable-dev-shm-usage")
         self.driver = None
         self.temp_dir = temp_dir
 
     def start_driver(self):
         try:
             self.driver = webdriver.Chrome(options=self.chrome_options)
+            # Execute script to remove webdriver property
+            #self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         except exceptions.SessionNotCreatedException as e:
-            # Let's close all chromes here
+            print(f"Session not created. Retrying after killing Chrome: {e}")
+            # Kill Chrome processes
             system = platform.system().lower()
             if system == "windows":
                 os.system("taskkill /im chrome.exe /f")
-            elif system == "darwin":  # macOS
+            elif system == "darwin":
                 os.system("pkill -a 'Google Chrome'")
             elif system == "linux":
                 os.system("pkill chrome")
             else:
                 print(f"Unsupported operating system: {system}")
-            #raise
+            time.sleep(2)  # Give the system time to clean up
+
+            # 🔁 RETRY driver start
+            self.driver = webdriver.Chrome(options=self.chrome_options)
+            self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
     def navigate_to(self, url):
         if not self.driver:
@@ -176,12 +186,22 @@ class Browser:
 
 # Example usage
 if __name__ == "__main__":
+    # Update these paths to match your system
     player = Browser(
-        user_data_dir="C:\\Users\\Zhenya\\AppData\\Local\\Google\\Chrome\\User Data",
+        user_data_dir="C:\\MySource\\gemini_voice_companion\\Chrome_User_Data",
         profile_directory="Default"
     )
-    player.start_driver()
-
-    player.play_song("Hotel California")
-    time.sleep(60)  # Wait for 5 minutes
-    player.close_driver()
+    
+    try:
+        player.start_driver()
+        success = player.play_song("Hotel California")
+        if success:
+            print("Song started successfully")
+            time.sleep(60)  # Wait for 1 minute
+        else:
+            print("Failed to play song")
+            
+    except Exception as e:
+        print(f"Error: {e}")
+    finally:
+        player.close_driver()
