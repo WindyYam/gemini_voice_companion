@@ -7,7 +7,7 @@ if __name__ == "__main__":
     from datetime import datetime, date, timedelta
     import io
     from typing import Literal
-    from gemini_ai import GeminiAI, SerializableFile
+    from gemini_ai import GeminiAI
     from voice_recognition import VoiceRecognition
     from text_to_speech import TextToSpeech
     from extern_api import *
@@ -21,7 +21,8 @@ if __name__ == "__main__":
     import numpy as np
     from queue import Queue
     from app_watchdog import ApplicationWatchdog, CHECK_INTERVAL
-
+    from unified_recorder import UnifiedRecorder
+    from google.generativeai.types.file_types import File
     print("Usage: Modify the config.json to change parameters")
 
     SOUNDS_PATH = 'sounds/'
@@ -46,11 +47,6 @@ if __name__ == "__main__":
         'vision_mode_camrea_is_screen' : False    # This will work with Discord video call to capture the video screen as the AI's vision, in this case you are on the other end of discord chat holding the phone camera
     }
 
-    import platform
-    if platform.system() == 'Windows':
-        pygame.camera.init('_camera (MSMF)')
-    else:
-        pygame.camera.init()
     pygame.mixer.init()
     scheduler = sched.scheduler(time.time, time.sleep)
     alarm_sound = pygame.mixer.Sound(f"{SOUNDS_PATH}alarm.mp3")
@@ -134,143 +130,6 @@ if __name__ == "__main__":
     check_config()
     set_browser_data_path(config['user_chrome_data_path'])
 
-    class UnifiedRecorder:
-        FPS = 4
-        def __init__(self, camera:pygame.camera.Camera):
-            """
-            Initialize unified recorder for both screen and camera recording
-            
-            Args:
-                camera_resolution (tuple): Resolution for camera recording
-                camera_index (int): Camera device index (usually 0 for built-in webcam)
-            """
-            self.is_recording = False
-            self.frame_queue = Queue()
-            self.recording_thread = None
-            self.recording_type = None
-            self.camera = camera
-            # unfortunately gemini samples video in 1 frame per second. We can however sample more frames per second and output in 1 fps so it is in slow motion
-            self.fps = UnifiedRecorder.FPS
-            
-        def capture_screen_frames(self):
-            """Background thread function to capture screen frames"""
-            while self.is_recording:
-                frame = ImageGrab.grab()
-                frame = np.array(frame)
-                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-                self.frame_queue.put(frame)
-                time.sleep(1/self.fps)
-                
-        def capture_camera_frames(self):
-            """Background thread function to capture camera frames"""
-            #self.camera.start()
-            while self.is_recording:
-                frame = self.camera.get_image()
-                frame_buffer = pygame.surfarray.array3d(frame)
-                frame_buffer = frame_buffer.transpose([1, 0, 2])
-                frame_array = np.array(frame_buffer)
-                frame_array = cv2.cvtColor(frame_array, cv2.COLOR_RGB2BGR)
-                self.frame_queue.put(frame_array)
-                time.sleep(1/self.fps)
-            #self.camera.stop()
-
-        def start_recording(self, record_type='screen'):
-            """
-            Start recording
-            
-            Args:
-                record_type (str): Type of recording ('screen' or 'camera')
-            
-            Returns:
-                bool: True if recording started successfully
-            """
-            if self.is_recording:
-                print("Recording is already in progress")
-                return False
-                
-            if record_type not in ['screen', 'camera']:
-                print("Invalid record type. Use 'screen' or 'camera'")
-                return False
-                
-            if record_type == 'camera' and self.camera is None:
-                print("Camera is not available")
-                return False
-            
-            self.is_recording = True
-            self.recording_type = record_type
-            
-            if record_type == 'screen':
-                self.recording_thread = threading.Thread(target=self.capture_screen_frames)
-            else:
-                self.recording_thread = threading.Thread(target=self.capture_camera_frames)
-                
-            self.recording_thread.start()
-            print(f"Started {record_type} recording...")
-            return True
-
-        def stop_recording(self, output_filename, resize_width=640):
-            """
-            Stop recording and save the video
-            
-            Args:
-                output_filename (str): Name for the output file (should end with .mp4)
-                resize_width (int): Resize the frame
-            
-            Returns:
-                str: Path to the saved video file
-            """
-            if not self.is_recording:
-                print("No recording in progress")
-                return None
-
-            # Stop the recording thread
-            self.is_recording = False
-            self.recording_thread.join()
-
-            # Get initial frame to determine dimensions
-            if self.frame_queue.empty():
-                print("No frames captured")
-                return None
-            
-            if(output_filename):
-                first_frame = self.frame_queue.queue[0]
-                height, width = first_frame.shape[:2]
-                new_width = int(resize_width)
-                new_height = int(resize_width / width * height)
-
-                # Initialize video writer
-                fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-                out = cv2.VideoWriter(
-                    output_filename,
-                    fourcc,
-                    1,  # Gemini sample video in 1 FPS, so higher FPS is useless in output
-                    (new_width, new_height),
-                    True
-                )
-
-                print("Processing and saving video...")
-                
-                frame_count = 0
-                while not self.frame_queue.empty():
-                    frame = self.frame_queue.get()
-                    
-                    # Apply basic compression
-                    frame = cv2.GaussianBlur(frame, (3, 3), 0)
-
-                    # Resize frame
-                    frame = cv2.resize(frame, (new_width, new_height), 
-                                    interpolation=cv2.INTER_AREA)
-                    
-                    frame = np.uint8(frame)
-                    
-                    out.write(frame)
-                    frame_count += 1
-
-                out.release()
-                print(f"Video saved to: {output_filename} ({frame_count} frames)")
-            self.frame_queue.queue.clear()
-            return output_filename
-
     instruction = [
         f'''Your name is {config['ai_name']}.
         You are a well educated and professional assistant, have great knowledge on everything. You make most suitable decision for the users.
@@ -278,7 +137,6 @@ if __name__ == "__main__":
         If the request message is with prefix **System:** then it means this message is from the system, not the user. 
         You have the interface on physical world through python code, there are several python function APIs to interact with the physical world. The list of which is in the uploaded text list file. 
         To execute the python code, put the code as python snippet format at the end of the response, then any code in the snippet in response will be executed. Only one code snippet per response is allowed.
-        In vision mode, the FPS of video uploaded is actually {UnifiedRecorder.FPS}, not 1.
         All your response will be spoken out by default using text to speech.
         Be aware, you will not respond to the guest for the requests about operating the house, unless you get authorization from the users that are not with guest prefix. For other kinds of requests, you should help with the guest. 
         To operate with the PC, use the python code execution with necessary library. But do not do potentially harmful operations, like deleting files, unless get the non guest users' permission. 
@@ -291,8 +149,20 @@ if __name__ == "__main__":
             f.write(text.strip() + "\n")
 
     def save_history():
+        def serialize_part(part):
+            if isinstance(part, File):
+                return f"+{part.name}+"
+            return part
+
+        # Serialize context['talk'], mapping File objects to "+filename+"
+        serialized_talk = []
+        for item in context['talk']:
+            new_item = item.copy()
+            new_item['parts'] = [serialize_part(p) for p in item['parts']]
+            serialized_talk.append(new_item)
+
         with open(f'{TEMP_PATH}{HISTORY_FILE}', "w", encoding='utf8') as f:
-            f.write(json.dumps(context['talk']))
+            f.write(json.dumps(serialized_talk))
 
     def load_history():
         try:
@@ -347,45 +217,34 @@ if __name__ == "__main__":
             context['vision_mode_camrea_is_screen'] = True
 
         if(on):
-            if not context['vision_mode_camrea_is_screen']:
-                cam.start()
             context['vision_mode'] = True
         else:
             context['vision_mode'] = False
-            cam.stop()
-            
+
     def camera_shot()->str:
-        # opening the camera, in case it is not open
-        cam.start()
-        # might need to adjust this value
-        time.sleep(0.5)
-        img = cam.get_image()
-        shutter_sound.play()
-        timestr = time.strftime("%Y%m%d-%H%M%S")
-        photo_path = f"{IMAGE_PATH}camera-{timestr}.jpg"
-        # saving the image 
-        pygame.image.save(img, photo_path)
-        return 'file:'+photo_path
+        # Use recorder's private camera for snapshot
+        if recorder._camera is not None:
+            recorder._camera.start()
+            time.sleep(0.5)
+            img = recorder._camera.get_image()
+            shutter_sound.play()
+            timestr = time.strftime("%Y%m%d-%H%M%S")
+            photo_path = f"{IMAGE_PATH}camera-{timestr}.jpg"
+            pygame.image.save(img, photo_path)
+            recorder._camera.stop()
+            return 'file:'+photo_path
+        else:
+            print("No camera available!")
+            return ''
     
     def screenshot() -> str:
-        # Capture the screenshot
-        screenshot = ImageGrab.grab()
+        # Capture the screenshot using UnifiedRecorder API
+        screenshot = recorder.grab_screen(resize_factor=0.5)
         shutter_sound.play()
-
-        # Half the resolution to minimize tokens used and increase speed
-        width, height = screenshot.size
-
-        # Calculate the new dimensions (half of the original)
-        new_width = width // 2
-        new_height = height // 2
-
-        # Resize the image to half resolution
-        screenshot = screenshot.resize((new_width, new_height), Image.LANCZOS)
-
+        if screenshot is None:
+            return ''
         timestr = time.strftime("%Y%m%d-%H%M%S")
         filename = f"{IMAGE_PATH}screenshot-{timestr}.jpg"
-
-        # Save the screenshot as JPG
         screenshot.save(filename, "JPEG")
         return 'file:'+filename
     
@@ -540,30 +399,14 @@ if __name__ == "__main__":
         delete_memory_sound.play()
 
     def main():
-        global context, gemini_ai, voice_recognition, text_to_speech, cam, mInputQueue, gemini_ai, text_to_speech, voice_recognition
+        global context, gemini_ai, voice_recognition, text_to_speech, recorder, mInputQueue, gemini_ai, text_to_speech, voice_recognition
 
         init_list = []
-        from json import JSONEncoder
-        # for gemini file serialization
-        def _default(self, obj):
-            return getattr(obj.__class__, "to_json", _default.default)(obj)
-
-        _default.default = JSONEncoder().default
-        JSONEncoder.default = _default
-
+        
         mInputQueue = queue.Queue()
 
-        # Initialize camera
-        camlist = pygame.camera.list_cameras()
-        img_size = (640, 360)
-        cam = None
-        if camlist:
-            if config['target_camera'] in camlist:
-                cam = pygame.camera.Camera(config['target_camera'], img_size)
-            else:
-                cam = pygame.camera.Camera(camlist[0], img_size)
-
-        recorder = UnifiedRecorder(cam)
+        # Initialize camera recorder (platform is now auto-detected in UnifiedRecorder)
+        recorder = UnifiedRecorder(target_camera=config.get('target_camera'))
 
         # Start event thread
         threading.Thread(target=event_thread).start()
@@ -594,7 +437,7 @@ if __name__ == "__main__":
         def check_history_files():
             for item in context['talk']:
                 for i, part in enumerate(item['parts']):
-                    if part is SerializableFile:
+                    if part is File:
                         try:
                             test = gemini_ai.get_file(part.name)
                         except Exception as e:
@@ -982,8 +825,8 @@ if __name__ == "__main__":
                     thread.join()
                 
                 # conserve energy
-                if not context['vision_mode']:
-                    cam.stop()
+                # if not context['vision_mode']:
+                #     cam.stop()
 
             except Exception as e:
                 print(e)

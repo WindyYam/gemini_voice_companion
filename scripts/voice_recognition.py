@@ -20,7 +20,7 @@ class VoiceRecognition:
             print('Setting Recorder: ', audio.get_default_input_device_info().get('name'))
         self.recorder_config = {
             'spinner': False,
-            'model': 'small',
+            'model': 'medium',
             'language': '',
             'silero_sensitivity': 0.3,
             'silero_use_onnx': True,
